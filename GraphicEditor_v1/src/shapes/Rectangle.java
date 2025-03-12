@@ -12,7 +12,7 @@ public class Rectangle extends Shape{
 		this.height = height;
 	}
 	@Override
-	void draw(Graphics g) {
+	public void draw(Graphics g) {
 		// TODO Auto-generated method stub
 		g.drawRect(point.x, point.y, width, height);
 	}

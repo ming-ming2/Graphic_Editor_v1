@@ -1,5 +1,6 @@
 package command;
 
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class CommandManager {
 		commandMap.put(context, command);
 	 }
 	 
-	 public void execute(Context context) {
-		 commandMap.get(context).execute();
+	 public void execute(Context context, CommandContext commandContext) {
+		 commandMap.getOrDefault(context, new DefaultCommand()).execute(commandContext);
 	 }
 }

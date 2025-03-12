@@ -1,5 +1,6 @@
 package global;
 
 public enum Context {
-	SHAPE //더 추가 에정..
+	DEFAULT,
+	SHAPE, //추가 에정..
 }
