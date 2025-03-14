@@ -1,18 +1,18 @@
-import command.*;
+import command.CommandManager;
+import command.DefaultCommand;
 import command.ShapeCommand;
-import global.Context;
+import global.Mode;
 import view.MainFrame;
 
 public class Main {
-	
+
 	public static void main(String[] args) {
-		//commandManager 생성
+		// commandManager 생성
 		CommandManager commandManager = new CommandManager();
-		commandManager.add(Context.DEFAULT, new DefaultCommand());
-		commandManager.add(Context.SHAPE, new ShapeCommand());
-		//mainFrame 생성 및 commandManager 주입
+		commandManager.add(Mode.DEFAULT, new DefaultCommand());
+		commandManager.add(Mode.SHAPE, new ShapeCommand());
+		// mainFrame 생성 및 commandManager 주입
 		MainFrame mainFrame = new MainFrame(commandManager);
-		mainFrame.initialize();
 		mainFrame.setVisible(true);
 
 	}

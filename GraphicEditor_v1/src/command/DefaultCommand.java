@@ -1,10 +1,9 @@
 package command;
 
-public class DefaultCommand implements Command{
+public class DefaultCommand implements Command {
 
-	@Override
-	public void execute() {
-		// 아무것도 하지않음.
-	}
-
+    @Override
+    public void execute(CommandContext commandContext) {
+        // 아무것도 하지않음
+    }
 }
