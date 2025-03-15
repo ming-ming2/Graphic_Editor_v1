@@ -1,5 +1,7 @@
 package command;
 
-public interface Command {
-	void execute(CommandContext commandContext);
+import dto.CommandDTO;
+
+public interface Command<T extends CommandDTO> {
+	void execute(T DTO);
 }

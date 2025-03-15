@@ -4,50 +4,52 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import command.CommandContext;
 import command.CommandManager;
-import global.ContextKey;
+import dto.ShapeCommandDTO;
 import global.Mode;
 import view.DrawingPanel;
 
 public class ShapeDrawingHandler implements MouseEventHandler {
 	private CommandManager commandManager;
 	private MouseEvent startEvent;
+	private DrawingPanel panel;
 
-	public ShapeDrawingHandler(CommandManager commandManager) {
+	public ShapeDrawingHandler(CommandManager commandManager, DrawingPanel panel) {
 		this.commandManager = commandManager;
+		this.panel = panel;
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e, DrawingPanel panel) {
+	public void mousePressed(MouseEvent e) {
 		startEvent = e;
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e, DrawingPanel panel) {
+	public void mouseReleased(MouseEvent e) {
 		if (startEvent != null) {
-			CommandContext cmdContext = createContext(startEvent, e, panel);
-			commandManager.execute(Mode.SHAPE, cmdContext);
+			List<MouseEvent> events = createMouseEvents(e);
+			commandManager.execute(Mode.SHAPE, new ShapeCommandDTO(events, panel.getCurrentShapeType(), panel));
 			panel.setPreviewShape(null);
 		}
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent e, DrawingPanel panel) {
+	public void mouseDragged(MouseEvent e) {
 		if (startEvent != null) {
-			CommandContext previewContext = createContext(startEvent, e, panel);
-			commandManager.execute(Mode.SHAPE, previewContext);
+			commandManager.execute(Mode.SHAPE, createDTO(e, panel));
 		}
 	}
 
-	private CommandContext createContext(MouseEvent start, MouseEvent current, DrawingPanel panel) {
-		CommandContext context = new CommandContext();
+	private List<MouseEvent> createMouseEvents(MouseEvent e) {
 		List<MouseEvent> events = new ArrayList<>();
-		events.add(start);
-		events.add(current);
-		context.put(ContextKey.MOUSE_EVENTS, events);
-		context.put(ContextKey.SHAPE_TYPE, panel.getCurrentShapeType());
-		context.put(ContextKey.DRAWING_PANEL, panel);
-		return context;
+		events.add(startEvent);
+		events.add(e);
+		return events;
 	}
+
+	private ShapeCommandDTO createDTO(MouseEvent e, DrawingPanel panel) {
+		List<MouseEvent> events = createMouseEvents(e);
+		return new ShapeCommandDTO(events, panel.getCurrentShapeType(), panel);
+	}
+
 }

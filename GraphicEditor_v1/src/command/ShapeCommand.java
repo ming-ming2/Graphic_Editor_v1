@@ -3,18 +3,18 @@ package command;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import global.ContextKey;
+import dto.ShapeCommandDTO;
 import global.ShapeType;
 import shapes.Shape;
 import shapes.ShapeFactory;
 import view.DrawingPanel;
 
-public class ShapeCommand implements Command {
+public class ShapeCommand implements Command<ShapeCommandDTO> {
 	@Override
-	public void execute(CommandContext context) {
-		List<MouseEvent> events = context.get(ContextKey.MOUSE_EVENTS, List.class);
-		ShapeType shapeType = context.get(ContextKey.SHAPE_TYPE, ShapeType.class);
-		DrawingPanel drawingPanel = context.get(ContextKey.DRAWING_PANEL, DrawingPanel.class);
+	public void execute(ShapeCommandDTO dto) {
+		List<MouseEvent> events = dto.getMouseEvents();
+		ShapeType shapeType = dto.getShapeType();
+		DrawingPanel drawingPanel = dto.getDrawingPanel();
 
 		if (events == null || events.size() < 2 || shapeType == null || drawingPanel == null) {
 			return; // 필요한 정보가 없으면 실행하지 않음

@@ -24,7 +24,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 	private CommandManager commandManager;
 	private MouseEventHandlerRepository mouseEventHandlers;;
 	private MouseEventHandler currentMouseEventHandler;
-	// Tools 필드
+	// 상태 필드, 나중에 별도의 상태관리 클래스로 분리
 	private Mode currentMode;
 	private ShapeType currentShapeType;
 
@@ -35,7 +35,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 
 	public DrawingPanel(CommandManager commandManager) {
 		this.commandManager = commandManager;
-		this.mouseEventHandlers = new MouseEventHandlerRepository(commandManager);
+		this.mouseEventHandlers = new MouseEventHandlerRepository(commandManager, this);
 		initialize();
 	}
 
@@ -66,7 +66,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					currentMouseEventHandler.mousePressed(e, DrawingPanel.this);
+					currentMouseEventHandler.mousePressed(e);
 					isDragging = true;
 				}
 			}
@@ -74,7 +74,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1 && isDragging) {
-					currentMouseEventHandler.mouseReleased(e, DrawingPanel.this);
+					currentMouseEventHandler.mouseReleased(e);
 					isDragging = false;
 					repaint();
 				}
@@ -85,7 +85,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (isDragging) {
-					currentMouseEventHandler.mouseDragged(e, DrawingPanel.this);
+					currentMouseEventHandler.mouseDragged(e);
 				}
 			}
 		});
