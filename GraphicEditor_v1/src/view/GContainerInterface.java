@@ -1,9 +1,7 @@
 package view;
 
-public interface ContainerInterface {
+public interface GContainerInterface {
 	default void initialize() {
-		createComponents();
-		arrangeComponents();
 		setProperties();
 		addEventHandler();
 	}

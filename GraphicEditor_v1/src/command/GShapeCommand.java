@@ -3,24 +3,24 @@ package command;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import dto.ShapeCommandDTO;
-import global.ShapeType;
-import shapes.Shape;
-import shapes.ShapeFactory;
-import view.DrawingPanel;
+import dto.GShapeCommandDTO;
+import global.GShapeType;
+import shapes.GShape;
+import shapes.GShapeFactory;
+import view.GDrawingPanel;
 
-public class ShapeCommand implements Command<ShapeCommandDTO> {
+public class GShapeCommand implements GCommand<GShapeCommandDTO> {
 	@Override
-	public void execute(ShapeCommandDTO dto) {
+	public void execute(GShapeCommandDTO dto) {
 		List<MouseEvent> events = dto.getMouseEvents();
-		ShapeType shapeType = dto.getShapeType();
-		DrawingPanel drawingPanel = dto.getDrawingPanel();
+		GShapeType shapeType = dto.getShapeType();
+		GDrawingPanel drawingPanel = dto.getDrawingPanel();
 
 		if (events == null || events.size() < 2 || shapeType == null || drawingPanel == null) {
 			return; // 필요한 정보가 없으면 실행하지 않음
 		}
 
-		Shape shape = ShapeFactory.getShape(shapeType, events);
+		GShape shape = GShapeFactory.getShape(shapeType, events);
 
 		if (shape != null) {
 			MouseEvent lastEvent = events.get(events.size() - 1);

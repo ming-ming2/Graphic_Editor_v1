@@ -1,5 +1,5 @@
 package global;
 
-public enum Mode {
+public enum GMode {
 	DEFAULT, SHAPE, DRAWING, // 추가 예정..
 }

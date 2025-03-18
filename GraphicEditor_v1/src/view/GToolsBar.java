@@ -8,18 +8,19 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-import global.Mode;
-import global.ShapeType;
+import global.GMode;
+import global.GShapeType;
 
-public class ToolsPanel extends JPanel implements ContainerInterface {
+public class GToolsBar extends JToolBar implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
-	private DrawingPanel drawingPanel;
+	private GDrawingPanel drawingPanel;
 
 	private JButton rectangleButton;
 
-	public ToolsPanel(DrawingPanel drawingPanel) {
+	public GToolsBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		initialize();
 	}
@@ -62,8 +63,8 @@ public class ToolsPanel extends JPanel implements ContainerInterface {
 		rectangleButton = new JButton("직사각형");
 		rectangleButton.setPreferredSize(new Dimension(100, 30));
 		rectangleButton.addActionListener(e -> {
-			drawingPanel.setCurrentShapeType(ShapeType.Rectangle);
-			drawingPanel.setCurrentMode(Mode.SHAPE);
+			drawingPanel.setCurrentShapeType(GShapeType.Rectangle);
+			drawingPanel.setCurrentMode(GMode.SHAPE);
 		});
 		panel.add(rectangleButton);
 

@@ -3,10 +3,10 @@ package shapes;
 import java.awt.Graphics;
 import java.awt.Point;
 
-public class Rectangle extends Shape{
+public class GRectangle extends GShape{
 	private int width;
 	private int height;
-	public Rectangle(Point point, int width, int height) {
+	public GRectangle(Point point, int width, int height) {
 		this.point = point;
 		this.width = width;
 		this.height = height;

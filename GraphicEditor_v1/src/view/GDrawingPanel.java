@@ -11,31 +11,31 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import command.CommandManager;
-import eventhandler.MouseEventHandler;
-import eventhandler.MouseEventHandlerRepository;
-import global.Mode;
-import global.ShapeType;
-import shapes.Shape;
+import command.GCommandManager;
+import eventhandler.GMouseEventHandler;
+import eventhandler.GMouseEventHandlerRepository;
+import global.GMode;
+import global.GShapeType;
+import shapes.GShape;
 
-public class DrawingPanel extends JPanel implements ContainerInterface {
+public class GDrawingPanel extends JPanel implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
-	private CommandManager commandManager;
-	private MouseEventHandlerRepository mouseEventHandlers;;
-	private MouseEventHandler currentMouseEventHandler;
+	private GCommandManager commandManager;
+	private GMouseEventHandlerRepository mouseEventHandlers;;
+	private GMouseEventHandler currentMouseEventHandler;
 	// 상태 필드, 나중에 별도의 상태관리 클래스로 분리
-	private Mode currentMode;
-	private ShapeType currentShapeType;
+	private GMode currentMode;
+	private GShapeType currentShapeType;
 
 	private boolean isDragging = false;
 
-	private List<Shape> shapes = new ArrayList<>(); // 저장된 도형들
-	private Shape previewShape = null; // 드래그 중 미리보기 도형
+	private List<GShape> shapes = new ArrayList<>(); // 저장된 도형들
+	private GShape previewShape = null; // 드래그 중 미리보기 도형
 
-	public DrawingPanel(CommandManager commandManager) {
+	public GDrawingPanel(GCommandManager commandManager) {
 		this.commandManager = commandManager;
-		this.mouseEventHandlers = new MouseEventHandlerRepository(commandManager, this);
+		this.mouseEventHandlers = new GMouseEventHandlerRepository(commandManager, this);
 		initialize();
 	}
 
@@ -55,9 +55,9 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 		this.setBackground(Color.WHITE);
 		this.setBorder(new LineBorder(Color.LIGHT_GRAY));
 
-		this.currentMode = Mode.DEFAULT; // 기본 모드
+		this.currentMode = GMode.DEFAULT; // 기본 모드
 		this.currentShapeType = null; // 기본 도형 타입
-		this.currentMouseEventHandler = mouseEventHandlers.get(Mode.DEFAULT); // 기본 핸들러
+		this.currentMouseEventHandler = mouseEventHandlers.get(GMode.DEFAULT); // 기본 핸들러
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 		super.paintComponent(g);
 
 		// 저장된 모든 도형 그리기
-		for (Shape shape : shapes) {
+		for (GShape shape : shapes) {
 			shape.draw(g);
 		}
 
@@ -107,7 +107,7 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 	}
 
 	// 최종 도형 추가 메서드
-	public void addShape(Shape shape) {
+	public void addShape(GShape shape) {
 		if (shape != null) {
 			shapes.add(shape);
 			repaint();
@@ -115,24 +115,24 @@ public class DrawingPanel extends JPanel implements ContainerInterface {
 	}
 
 	// 미리보기 도형 설정 메서드
-	public void setPreviewShape(Shape shape) {
+	public void setPreviewShape(GShape shape) {
 		this.previewShape = shape;
 		repaint();
 	}
 
 	// 현재 모드 설정 메서드
-	public void setCurrentMode(Mode mode) {
+	public void setCurrentMode(GMode mode) {
 		this.currentMode = mode;
 		this.currentMouseEventHandler = this.mouseEventHandlers.get(mode);
 	}
 
 	// 현재 도형 타입 설정 메서드
-	public void setCurrentShapeType(ShapeType shapeType) {
+	public void setCurrentShapeType(GShapeType shapeType) {
 		this.currentShapeType = shapeType;
 	}
 
 	// 현재 도형 타입 반환 메서드
-	public ShapeType getCurrentShapeType() {
+	public GShapeType getCurrentShapeType() {
 		return currentShapeType;
 	}
 }

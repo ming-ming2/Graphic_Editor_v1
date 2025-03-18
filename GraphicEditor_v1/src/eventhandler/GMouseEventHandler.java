@@ -2,7 +2,7 @@ package eventhandler;
 
 import java.awt.event.MouseEvent;
 
-public interface MouseEventHandler {
+public interface GMouseEventHandler {
 	void mousePressed(MouseEvent e);
 
 	void mouseReleased(MouseEvent e);

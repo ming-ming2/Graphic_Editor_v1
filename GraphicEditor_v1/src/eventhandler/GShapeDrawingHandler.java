@@ -4,17 +4,17 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import command.CommandManager;
-import dto.ShapeCommandDTO;
-import global.Mode;
-import view.DrawingPanel;
+import command.GCommandManager;
+import dto.GShapeCommandDTO;
+import global.GMode;
+import view.GDrawingPanel;
 
-public class ShapeDrawingHandler implements MouseEventHandler {
-	private CommandManager commandManager;
+public class GShapeDrawingHandler implements GMouseEventHandler {
+	private GCommandManager commandManager;
 	private MouseEvent startEvent;
-	private DrawingPanel panel;
+	private GDrawingPanel panel;
 
-	public ShapeDrawingHandler(CommandManager commandManager, DrawingPanel panel) {
+	public GShapeDrawingHandler(GCommandManager commandManager, GDrawingPanel panel) {
 		this.commandManager = commandManager;
 		this.panel = panel;
 	}
@@ -28,7 +28,7 @@ public class ShapeDrawingHandler implements MouseEventHandler {
 	public void mouseReleased(MouseEvent e) {
 		if (startEvent != null) {
 			List<MouseEvent> events = createMouseEvents(e);
-			commandManager.execute(Mode.SHAPE, new ShapeCommandDTO(events, panel.getCurrentShapeType(), panel));
+			commandManager.execute(GMode.SHAPE, new GShapeCommandDTO(events, panel.getCurrentShapeType(), panel));
 			panel.setPreviewShape(null);
 		}
 	}
@@ -36,7 +36,7 @@ public class ShapeDrawingHandler implements MouseEventHandler {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (startEvent != null) {
-			commandManager.execute(Mode.SHAPE, createDTO(e, panel));
+			commandManager.execute(GMode.SHAPE, createDTO(e, panel));
 		}
 	}
 
@@ -47,9 +47,9 @@ public class ShapeDrawingHandler implements MouseEventHandler {
 		return events;
 	}
 
-	private ShapeCommandDTO createDTO(MouseEvent e, DrawingPanel panel) {
+	private GShapeCommandDTO createDTO(MouseEvent e, GDrawingPanel panel) {
 		List<MouseEvent> events = createMouseEvents(e);
-		return new ShapeCommandDTO(events, panel.getCurrentShapeType(), panel);
+		return new GShapeCommandDTO(events, panel.getCurrentShapeType(), panel);
 	}
 
 }

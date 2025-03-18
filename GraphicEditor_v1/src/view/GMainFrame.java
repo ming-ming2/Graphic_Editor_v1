@@ -7,30 +7,30 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import command.CommandManager;
+import command.GCommandManager;
 
-public class MainFrame extends JFrame implements ContainerInterface {
+public class GMainFrame extends JFrame implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
-	private CommandManager commandManager;
+	private GCommandManager commandManager;
 
-	private DrawingPanel drawingPanel;
-	private ToolsPanel toolsPanel;
+	private GDrawingPanel drawingPanel;
+	private GToolsBar toolsBar;
 
-	public MainFrame(CommandManager commandManager) {
+	public GMainFrame(GCommandManager commandManager) {
 		this.commandManager = commandManager;
 		initialize();
 	}
 
 	@Override
 	public void createComponents() {
-		drawingPanel = new DrawingPanel(commandManager);
-		toolsPanel = new ToolsPanel(drawingPanel);
+		drawingPanel = new GDrawingPanel(commandManager);
+		toolsBar = new GToolsBar(drawingPanel);
 	}
 
 	@Override
 	public void arrangeComponents() {
 		setLayout(new BorderLayout());
-		add(toolsPanel, BorderLayout.NORTH);
+		add(toolsBar, BorderLayout.NORTH);
 		JPanel centerPanel = new JPanel(new BorderLayout());
 		centerPanel.add(drawingPanel, BorderLayout.CENTER);
 		add(centerPanel, BorderLayout.CENTER);

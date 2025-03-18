@@ -2,7 +2,7 @@ package eventhandler;
 
 import java.awt.event.MouseEvent;
 
-public class DefaultHandler implements MouseEventHandler {
+public class DefaultHandler implements GMouseEventHandler {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
