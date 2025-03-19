@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import command.GCommandManager;
-import global.GMode;
+import type.GMode;
 import view.GDrawingPanel;
 
 public class GMouseEventHandlerRepository {

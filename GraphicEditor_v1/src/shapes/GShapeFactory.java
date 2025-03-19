@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import global.GShapeType;
+import type.GShapeType;
 
 public class GShapeFactory {
 	public static GShape getShape(GShapeType type, List<MouseEvent> events) {

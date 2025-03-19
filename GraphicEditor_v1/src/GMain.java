@@ -1,7 +1,7 @@
-import command.GCommandManager;
 import command.DefaultCommand;
+import command.GCommandManager;
 import command.GShapeCommand;
-import global.GMode;
+import type.GMode;
 import view.GMainFrame;
 
 public class GMain {
@@ -14,6 +14,7 @@ public class GMain {
 		// mainFrame 생성 및 commandManager 주입
 		GMainFrame mainFrame = new GMainFrame(commandManager);
 		mainFrame.setVisible(true);
+		mainFrame.initialize();
 
 	}
 

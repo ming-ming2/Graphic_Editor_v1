@@ -6,7 +6,7 @@ import java.util.List;
 
 import command.GCommandManager;
 import dto.GShapeCommandDTO;
-import global.GMode;
+import type.GMode;
 import view.GDrawingPanel;
 
 public class GShapeDrawingHandler implements GMouseEventHandler {

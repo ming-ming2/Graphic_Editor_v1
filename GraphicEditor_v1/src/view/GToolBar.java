@@ -10,19 +10,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import global.GMode;
-import global.GShapeType;
+import type.GMode;
+import type.GShapeType;
 
-public class GToolsBar extends JToolBar implements GContainerInterface {
+public class GToolBar extends JToolBar implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
 	private GDrawingPanel drawingPanel;
 
 	private JButton rectangleButton;
 
-	public GToolsBar(GDrawingPanel drawingPanel) {
+	public GToolBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
-		initialize();
 	}
 
 	@Override
@@ -37,7 +36,7 @@ public class GToolsBar extends JToolBar implements GContainerInterface {
 	}
 
 	@Override
-	public void setProperties() {
+	public void setAttributes() {
 		setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
 		setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 

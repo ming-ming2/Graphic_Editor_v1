@@ -3,6 +3,8 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,30 +16,35 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	private GCommandManager commandManager;
 
 	private GDrawingPanel drawingPanel;
-	private GToolsBar toolsBar;
+	private GToolBar toolBar;
+	private GMenuBar menuBar;
+	private List<GContainerInterface> components = new ArrayList<>();
 
 	public GMainFrame(GCommandManager commandManager) {
 		this.commandManager = commandManager;
-		initialize();
 	}
 
 	@Override
 	public void createComponents() {
 		drawingPanel = new GDrawingPanel(commandManager);
-		toolsBar = new GToolsBar(drawingPanel);
+		toolBar = new GToolBar(drawingPanel);
+		menuBar = new GMenuBar();
+		components.add(drawingPanel);
+		components.add(toolBar);
+		components.add(menuBar);
 	}
 
 	@Override
 	public void arrangeComponents() {
 		setLayout(new BorderLayout());
-		add(toolsBar, BorderLayout.NORTH);
+		add(toolBar, BorderLayout.NORTH);
 		JPanel centerPanel = new JPanel(new BorderLayout());
 		centerPanel.add(drawingPanel, BorderLayout.CENTER);
 		add(centerPanel, BorderLayout.CENTER);
 	}
 
 	@Override
-	public void setProperties() {
+	public void setAttributes() {
 		this.setTitle("Graphic Editor_V1");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setSize(1600, 900);
@@ -50,6 +57,17 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	public void addEventHandler() {
 		//
 
+	}
+
+	@Override
+	public void initialize() {
+		createComponents();
+		arrangeComponents();
+		setAttributes();
+		addEventHandler();
+		for (GContainerInterface component : components) {
+			component.initialize();
+		}
 	}
 
 }

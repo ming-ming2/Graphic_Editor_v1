@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dto.GCommandDTO;
-import global.GMode;
+import type.GMode;
 
 public class GCommandManager {
 	private final Map<GMode, GCommand> commands = new HashMap<>();

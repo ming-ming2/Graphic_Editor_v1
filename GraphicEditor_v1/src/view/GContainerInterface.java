@@ -2,7 +2,9 @@ package view;
 
 public interface GContainerInterface {
 	default void initialize() {
-		setProperties();
+		createComponents();
+		arrangeComponents();
+		setAttributes();
 		addEventHandler();
 	}
 
@@ -10,7 +12,7 @@ public interface GContainerInterface {
 
 	void arrangeComponents();
 
-	void setProperties();
+	void setAttributes();
 
 	void addEventHandler();
 }

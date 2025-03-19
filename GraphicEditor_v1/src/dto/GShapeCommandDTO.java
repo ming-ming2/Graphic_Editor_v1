@@ -3,7 +3,7 @@ package dto;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import global.GShapeType;
+import type.GShapeType;
 import view.GDrawingPanel;
 
 public class GShapeCommandDTO implements GCommandDTO {

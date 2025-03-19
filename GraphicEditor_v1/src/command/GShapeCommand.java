@@ -4,9 +4,9 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import dto.GShapeCommandDTO;
-import global.GShapeType;
 import shapes.GShape;
 import shapes.GShapeFactory;
+import type.GShapeType;
 import view.GDrawingPanel;
 
 public class GShapeCommand implements GCommand<GShapeCommandDTO> {

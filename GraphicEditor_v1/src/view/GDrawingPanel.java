@@ -14,9 +14,9 @@ import javax.swing.border.LineBorder;
 import command.GCommandManager;
 import eventhandler.GMouseEventHandler;
 import eventhandler.GMouseEventHandlerRepository;
-import global.GMode;
-import global.GShapeType;
 import shapes.GShape;
+import type.GMode;
+import type.GShapeType;
 
 public class GDrawingPanel extends JPanel implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
@@ -36,7 +36,6 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 	public GDrawingPanel(GCommandManager commandManager) {
 		this.commandManager = commandManager;
 		this.mouseEventHandlers = new GMouseEventHandlerRepository(commandManager, this);
-		initialize();
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 	}
 
 	@Override
-	public void setProperties() {
+	public void setAttributes() {
 		this.setPreferredSize(new java.awt.Dimension(800, 600));
 		this.setBackground(Color.WHITE);
 		this.setBorder(new LineBorder(Color.LIGHT_GRAY));
