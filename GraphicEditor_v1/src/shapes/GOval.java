@@ -1,0 +1,12 @@
+package shapes;
+
+import java.awt.Graphics;
+
+public class GOval extends GShape {
+
+	@Override
+	public void draw(Graphics g) {
+
+	}
+
+}
