@@ -14,6 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -34,7 +36,9 @@ import type.GShapeType;
 public class GToolBar extends JToolBar implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
-	private JButton rectangleButton;
+	private JButton currentSelectedButton = null; // 현재 선택된 버튼 추적용
+	private Color selectedColor = new Color(230, 230, 250); // 선택된 버튼 색상
+	private List<JButton> shapeButtons = new ArrayList<>(); // 모든 도형 버튼 저장
 
 	private JPanel leftPanel;
 	private JPanel centerPanel;
@@ -122,7 +126,7 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 	private void createShapeButtons(JPanel panel) {
 		addShapeButton(panel, "직선", GShapeType.Line);
 		addShapeButton(panel, "화살표", GShapeType.Arrow);
-		rectangleButton = addShapeButton(panel, "사각형", GShapeType.Rectangle);
+		addShapeButton(panel, "사각형", GShapeType.Rectangle);
 		addShapeButton(panel, "둥근 사각형", GShapeType.RoundRectangle);
 		addShapeButton(panel, "타원", GShapeType.Oval);
 		addShapeButton(panel, "다이아몬드", GShapeType.Diamond);
@@ -150,28 +154,63 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		button.setOpaque(true);
 		button.setIcon(createShapeIcon(shapeType));
 
+		// 마우스 이벤트 처리 수정 - 토글이 아닐 때만 마우스 오버 효과 적용
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				button.setBackground(new Color(230, 230, 250));
+				// 현재 선택된 버튼이 아닐 경우에만 마우스 오버 효과 적용
+				if (currentSelectedButton != button) {
+					button.setBackground(new Color(245, 245, 255)); // 약간 연한 마우스 오버 색상
+				}
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				button.setBackground(Color.WHITE);
+				// 선택된 버튼이 아닐 경우에만 원래 색상으로 복원
+				if (currentSelectedButton != button) {
+					button.setBackground(Color.WHITE);
+				}
 			}
 		});
 
+		// 액션 리스너 수정 - 토글 기능 추가
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				GDrawingStateManager.getInstance().setCurrentShapeType(shapeType);
-				GDrawingStateManager.getInstance().setCurrentMode(GMode.SHAPE);
-				System.out.println("Selected shape: " + shapeType);
+				GDrawingStateManager drawingStateManager = GDrawingStateManager.getInstance();
+
+				// 이미 선택된 버튼을 다시 클릭한 경우 (토글 해제)
+				if (button == currentSelectedButton) {
+					// 버튼 선택 해제
+					button.setBackground(Color.WHITE);
+					currentSelectedButton = null;
+
+					// 모드를 DEFAULT로 변경
+					drawingStateManager.setCurrentMode(GMode.DEFAULT);
+					drawingStateManager.setCurrentShapeType(null);
+					System.out.println("Toggled OFF - Mode: DEFAULT");
+				}
+				// 새로운 버튼을 클릭한 경우
+				else {
+					// 기존에 선택된 버튼이 있다면 해제
+					if (currentSelectedButton != null) {
+						currentSelectedButton.setBackground(Color.WHITE);
+					}
+
+					// 새 버튼 선택
+					button.setBackground(selectedColor);
+					currentSelectedButton = button;
+
+					// 도형 모드로 변경
+					drawingStateManager.setCurrentShapeType(shapeType);
+					drawingStateManager.setCurrentMode(GMode.SHAPE);
+					System.out.println("Toggled ON - Selected shape: " + shapeType);
+				}
 			}
 		});
 
 		panel.add(button);
+		shapeButtons.add(button); // 버튼 목록에 추가
 		return button;
 	}
 
@@ -313,6 +352,14 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		}
 
 		g2d.drawPolygon(xPoints, yPoints, points * 2);
+	}
+
+	// 모든 도형 버튼 선택 해제 메서드 (외부에서 호출 가능)
+	public void clearAllSelection() {
+		if (currentSelectedButton != null) {
+			currentSelectedButton.setBackground(Color.WHITE);
+			currentSelectedButton = null;
+		}
 	}
 
 	private int getToolbarHeight() {
