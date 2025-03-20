@@ -33,8 +33,8 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 
 	@Override
 	public void arrangeComponents() {
-		this.setJMenuBar(menuBar);
 		this.setLayout(new BorderLayout());
+		this.setJMenuBar(menuBar);
 		this.add(toolBar, BorderLayout.NORTH);
 		JPanel centerPanel = new JPanel(new BorderLayout());
 		centerPanel.add(drawingPanel, BorderLayout.CENTER);
@@ -45,7 +45,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	public void setAttributes() {
 		this.setTitle("Graphic Editor_V1");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setSize(1600, 900);
+		this.setSize((int) (dim.width / 2.), dim.height / 2);
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
