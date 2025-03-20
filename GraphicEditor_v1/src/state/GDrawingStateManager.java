@@ -6,6 +6,7 @@ import java.util.List;
 import command.DefaultCommand;
 import command.GCommandManager;
 import command.GShapeCommand;
+import eventhandler.DefaultHandler;
 import eventhandler.GMouseEventHandler;
 import eventhandler.GMouseEventHandlerRegistry;
 import shapes.GShape;
@@ -34,6 +35,7 @@ public class GDrawingStateManager implements GStateManager {
 		this.commandManager.add(GMode.DEFAULT, new DefaultCommand());
 		this.commandManager.add(GMode.SHAPE, new GShapeCommand());
 		this.mouserEventHandlerRegistry = new GMouseEventHandlerRegistry(commandManager);
+		this.currentMouseEventHandler = new DefaultHandler();
 		this.currentMode = GMode.DEFAULT;
 		this.currentShapeType = null;
 		this.shapes = new ArrayList<>();

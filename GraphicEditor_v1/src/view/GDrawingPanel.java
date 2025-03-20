@@ -19,9 +19,6 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 	private GDrawingStateManager drawingStateManager;
 	private boolean isDragging = false;
 
-//	private List<GShape> shapes = new ArrayList<>(); // 저장된 도형들
-//	private GShape previewShape = null; // 드래그 중 미리보기 도형
-
 	public GDrawingPanel() {
 		this.drawingStateManager = GDrawingStateManager.getInstance();
 		GDrawingStateManager.getInstance().addObserver(this);
@@ -90,20 +87,6 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			drawingStateManager.getPreviewShape().draw(g);
 		}
 	}
-
-//	// 최종 도형 추가 메서드
-//	public void addShape(GShape shape) {
-//		if (shape != null) {
-//			shapes.add(shape);
-//			repaint();
-//		}
-//	}
-//
-//	// 미리보기 도형 설정 메서드
-//	public void setPreviewShape(GShape shape) {
-//		this.previewShape = shape;
-//		repaint();
-//	}
 
 	@Override
 	public void update() {
