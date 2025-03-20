@@ -9,38 +9,36 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import command.GCommandManager;
-
 public class GMainFrame extends JFrame implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
-	private GCommandManager commandManager;
 
 	private GDrawingPanel drawingPanel;
 	private GToolBar toolBar;
 	private GMenuBar menuBar;
 	private List<GContainerInterface> components = new ArrayList<>();
 
-	public GMainFrame(GCommandManager commandManager) {
-		this.commandManager = commandManager;
+	public GMainFrame() {
+
 	}
 
 	@Override
 	public void createComponents() {
-		drawingPanel = new GDrawingPanel(commandManager);
-		toolBar = new GToolBar(drawingPanel);
-		menuBar = new GMenuBar();
-		components.add(drawingPanel);
-		components.add(toolBar);
-		components.add(menuBar);
+		this.drawingPanel = new GDrawingPanel();
+		this.toolBar = new GToolBar();
+		this.menuBar = new GMenuBar();
+		this.components.add(drawingPanel);
+		this.components.add(toolBar);
+		this.components.add(menuBar);
 	}
 
 	@Override
 	public void arrangeComponents() {
-		setLayout(new BorderLayout());
-		add(toolBar, BorderLayout.NORTH);
+		this.setJMenuBar(menuBar);
+		this.setLayout(new BorderLayout());
+		this.add(toolBar, BorderLayout.NORTH);
 		JPanel centerPanel = new JPanel(new BorderLayout());
 		centerPanel.add(drawingPanel, BorderLayout.CENTER);
-		add(centerPanel, BorderLayout.CENTER);
+		this.add(centerPanel, BorderLayout.CENTER);
 	}
 
 	@Override

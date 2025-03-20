@@ -5,14 +5,13 @@ import java.util.Map;
 
 import command.GCommandManager;
 import type.GMode;
-import view.GDrawingPanel;
 
-public class GMouseEventHandlerRepository {
+public class GMouseEventHandlerRegistry {
 	private Map<GMode, GMouseEventHandler> handlers = new HashMap<>();
 
-	public GMouseEventHandlerRepository(GCommandManager commandManager, GDrawingPanel panel) {
+	public GMouseEventHandlerRegistry(GCommandManager commandManager) {
 		handlers.put(GMode.DEFAULT, new DefaultHandler());
-		handlers.put(GMode.SHAPE, new GShapeDrawingHandler(commandManager, panel));
+		handlers.put(GMode.SHAPE, new GShapeDrawingHandler(commandManager));
 		// 추가 예정..
 	}
 

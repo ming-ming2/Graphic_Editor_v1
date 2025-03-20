@@ -5,37 +5,26 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import command.GCommandManager;
-import eventhandler.GMouseEventHandler;
-import eventhandler.GMouseEventHandlerRepository;
 import shapes.GShape;
-import type.GMode;
-import type.GShapeType;
+import state.GDrawingStateManager;
+import state.GObserver;
 
-public class GDrawingPanel extends JPanel implements GContainerInterface {
+public class GDrawingPanel extends JPanel implements GContainerInterface, GObserver {
 	private static final long serialVersionUID = 1L;
 
-	private GCommandManager commandManager;
-	private GMouseEventHandlerRepository mouseEventHandlers;;
-	private GMouseEventHandler currentMouseEventHandler;
-	// 상태 필드, 나중에 별도의 상태관리 클래스로 분리
-	private GMode currentMode;
-	private GShapeType currentShapeType;
-
+	private GDrawingStateManager drawingStateManager;
 	private boolean isDragging = false;
 
-	private List<GShape> shapes = new ArrayList<>(); // 저장된 도형들
-	private GShape previewShape = null; // 드래그 중 미리보기 도형
+//	private List<GShape> shapes = new ArrayList<>(); // 저장된 도형들
+//	private GShape previewShape = null; // 드래그 중 미리보기 도형
 
-	public GDrawingPanel(GCommandManager commandManager) {
-		this.commandManager = commandManager;
-		this.mouseEventHandlers = new GMouseEventHandlerRepository(commandManager, this);
+	public GDrawingPanel() {
+		this.drawingStateManager = GDrawingStateManager.getInstance();
+		GDrawingStateManager.getInstance().addObserver(this);
 	}
 
 	@Override
@@ -54,9 +43,6 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 		this.setBackground(Color.WHITE);
 		this.setBorder(new LineBorder(Color.LIGHT_GRAY));
 
-		this.currentMode = GMode.DEFAULT; // 기본 모드
-		this.currentShapeType = null; // 기본 도형 타입
-		this.currentMouseEventHandler = mouseEventHandlers.get(GMode.DEFAULT); // 기본 핸들러
 	}
 
 	@Override
@@ -65,7 +51,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					currentMouseEventHandler.mousePressed(e);
+					drawingStateManager.getCurrentMouseEventHandler().mousePressed(e);
 					isDragging = true;
 				}
 			}
@@ -73,7 +59,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1 && isDragging) {
-					currentMouseEventHandler.mouseReleased(e);
+					drawingStateManager.getCurrentMouseEventHandler().mouseReleased(e);
 					isDragging = false;
 					repaint();
 				}
@@ -84,7 +70,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (isDragging) {
-					currentMouseEventHandler.mouseDragged(e);
+					drawingStateManager.getCurrentMouseEventHandler().mouseDragged(e);
 				}
 			}
 		});
@@ -95,43 +81,33 @@ public class GDrawingPanel extends JPanel implements GContainerInterface {
 		super.paintComponent(g);
 
 		// 저장된 모든 도형 그리기
-		for (GShape shape : shapes) {
+		for (GShape shape : drawingStateManager.getShapes()) {
 			shape.draw(g);
 		}
 
 		// 미리보기 도형 그리기
-		if (previewShape != null) {
-			previewShape.draw(g);
+		if (drawingStateManager.getPreviewShape() != null) {
+			drawingStateManager.getPreviewShape().draw(g);
 		}
 	}
 
-	// 최종 도형 추가 메서드
-	public void addShape(GShape shape) {
-		if (shape != null) {
-			shapes.add(shape);
-			repaint();
-		}
-	}
+//	// 최종 도형 추가 메서드
+//	public void addShape(GShape shape) {
+//		if (shape != null) {
+//			shapes.add(shape);
+//			repaint();
+//		}
+//	}
+//
+//	// 미리보기 도형 설정 메서드
+//	public void setPreviewShape(GShape shape) {
+//		this.previewShape = shape;
+//		repaint();
+//	}
 
-	// 미리보기 도형 설정 메서드
-	public void setPreviewShape(GShape shape) {
-		this.previewShape = shape;
+	@Override
+	public void update() {
 		repaint();
 	}
 
-	// 현재 모드 설정 메서드
-	public void setCurrentMode(GMode mode) {
-		this.currentMode = mode;
-		this.currentMouseEventHandler = this.mouseEventHandlers.get(mode);
-	}
-
-	// 현재 도형 타입 설정 메서드
-	public void setCurrentShapeType(GShapeType shapeType) {
-		this.currentShapeType = shapeType;
-	}
-
-	// 현재 도형 타입 반환 메서드
-	public GShapeType getCurrentShapeType() {
-		return currentShapeType;
-	}
 }

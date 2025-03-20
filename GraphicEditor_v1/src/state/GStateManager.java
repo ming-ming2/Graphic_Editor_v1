@@ -1,8 +1,8 @@
 package state;
 
-public interface GStateManager<T> {
-	void addObserver(T observer);
+public interface GStateManager {
+	abstract void addObserver(GObserver observer);
 
-	void notifyObservers();
+	abstract void notifyObservers();
 
 }

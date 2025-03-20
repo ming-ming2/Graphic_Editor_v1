@@ -6,17 +6,15 @@ import java.util.List;
 
 import command.GCommandManager;
 import dto.GShapeCommandDTO;
+import state.GDrawingStateManager;
 import type.GMode;
-import view.GDrawingPanel;
 
 public class GShapeDrawingHandler implements GMouseEventHandler {
 	private GCommandManager commandManager;
 	private MouseEvent startEvent;
-	private GDrawingPanel panel;
 
-	public GShapeDrawingHandler(GCommandManager commandManager, GDrawingPanel panel) {
+	public GShapeDrawingHandler(GCommandManager commandManager) {
 		this.commandManager = commandManager;
-		this.panel = panel;
 	}
 
 	@Override
@@ -28,15 +26,15 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	public void mouseReleased(MouseEvent e) {
 		if (startEvent != null) {
 			List<MouseEvent> events = createMouseEvents(e);
-			commandManager.execute(GMode.SHAPE, new GShapeCommandDTO(events, panel.getCurrentShapeType(), panel));
-			panel.setPreviewShape(null);
+			commandManager.execute(GMode.SHAPE, new GShapeCommandDTO(events));
+			GDrawingStateManager.getInstance().setPreviewShape(null);
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (startEvent != null) {
-			commandManager.execute(GMode.SHAPE, createDTO(e, panel));
+			commandManager.execute(GMode.SHAPE, createDTO(e));
 		}
 	}
 
@@ -47,9 +45,9 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 		return events;
 	}
 
-	private GShapeCommandDTO createDTO(MouseEvent e, GDrawingPanel panel) {
+	private GShapeCommandDTO createDTO(MouseEvent e) {
 		List<MouseEvent> events = createMouseEvents(e);
-		return new GShapeCommandDTO(events, panel.getCurrentShapeType(), panel);
+		return new GShapeCommandDTO(events);
 	}
 
 }

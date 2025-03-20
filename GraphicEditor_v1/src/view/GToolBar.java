@@ -10,24 +10,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import state.GDrawingStateManager;
 import type.GMode;
 import type.GShapeType;
 
 public class GToolBar extends JToolBar implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
-	private GDrawingPanel drawingPanel;
-
 	private JButton rectangleButton;
 
-	public GToolBar(GDrawingPanel drawingPanel) {
-		this.drawingPanel = drawingPanel;
+	public GToolBar() {
+
 	}
 
 	@Override
 	public void createComponents() {
 		JPanel shapesSection = createShapesSection();
-		add(shapesSection);
+		this.add(shapesSection);
 	}
 
 	@Override
@@ -37,11 +36,11 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 
 	@Override
 	public void setAttributes() {
-		setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
-		setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+		this.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+		this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
-		setPreferredSize(new Dimension(0, 60));
-		setBackground(new Color(240, 240, 240));
+		this.setPreferredSize(new Dimension(0, 60));
+		this.setBackground(new Color(240, 240, 240));
 	}
 
 	@Override
@@ -62,8 +61,8 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		rectangleButton = new JButton("직사각형");
 		rectangleButton.setPreferredSize(new Dimension(100, 30));
 		rectangleButton.addActionListener(e -> {
-			drawingPanel.setCurrentShapeType(GShapeType.Rectangle);
-			drawingPanel.setCurrentMode(GMode.SHAPE);
+			GDrawingStateManager.getInstance().setCurrentShapeType(GShapeType.Rectangle);
+			GDrawingStateManager.getInstance().setCurrentMode(GMode.SHAPE);
 		});
 		panel.add(rectangleButton);
 
