@@ -3,21 +3,21 @@ package command;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import dto.GShapeCommandDTO;
 import shapes.GShape;
 import shapes.GShapeFactory;
 import state.GDrawingStateManager;
+import state.GEventStateMananger;
 import type.GShapeType;
 
-public class GShapeCommand implements GCommand<GShapeCommandDTO> {
+public class GShapeCommand implements GCommand {
 	@Override
-	public void execute(GShapeCommandDTO dto) {
-		List<MouseEvent> events = dto.getMouseEvents();
+	public void execute() {
+		List<MouseEvent> events = GEventStateMananger.getInstance().getMouseEvents();
 		GDrawingStateManager drawingStateManager = GDrawingStateManager.getInstance();
 		GShapeType shapeType = drawingStateManager.getCurrentShapeType();
 
 		if (events == null || events.size() < 2 || shapeType == null) {
-			return; // 필요한 정보가 없으면 실행하지 않음
+			return;
 		}
 
 		GShape shape = GShapeFactory.getShape(shapeType, events);
@@ -28,7 +28,6 @@ public class GShapeCommand implements GCommand<GShapeCommandDTO> {
 				drawingStateManager.addShape(shape);
 				drawingStateManager.setPreviewShape(null);
 			} else {
-				// 드래그 중 미리보기 도형 업데이트
 				drawingStateManager.setPreviewShape(shape);
 			}
 		}

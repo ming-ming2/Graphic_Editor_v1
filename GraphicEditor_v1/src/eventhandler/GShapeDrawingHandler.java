@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import command.GCommandManager;
-import dto.GShapeCommandDTO;
 import state.GDrawingStateManager;
+import state.GEventStateMananger;
 import type.GMode;
 
 public class GShapeDrawingHandler implements GMouseEventHandler {
@@ -25,8 +25,8 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (startEvent != null) {
-			List<MouseEvent> events = createMouseEvents(e);
-			commandManager.execute(GMode.SHAPE, new GShapeCommandDTO(events));
+			GEventStateMananger.getInstance().setMouseEvents(createMouseEvents(e));
+			commandManager.execute(GMode.SHAPE);
 			GDrawingStateManager.getInstance().setPreviewShape(null);
 		}
 	}
@@ -34,7 +34,8 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (startEvent != null) {
-			commandManager.execute(GMode.SHAPE, createDTO(e));
+			GEventStateMananger.getInstance().setMouseEvents(createMouseEvents(e));
+			commandManager.execute(GMode.SHAPE);
 		}
 	}
 
@@ -43,11 +44,6 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 		events.add(startEvent);
 		events.add(e);
 		return events;
-	}
-
-	private GShapeCommandDTO createDTO(MouseEvent e) {
-		List<MouseEvent> events = createMouseEvents(e);
-		return new GShapeCommandDTO(events);
 	}
 
 }

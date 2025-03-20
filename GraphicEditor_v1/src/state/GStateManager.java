@@ -1,8 +1,19 @@
 package state;
 
-public interface GStateManager {
-	abstract void addObserver(GObserver observer);
+import java.util.ArrayList;
+import java.util.List;
 
-	abstract void notifyObservers();
+public abstract class GStateManager {
+	protected List<GObserver> observers = new ArrayList<>();
+
+	public void addObserver(GObserver observer) {
+		observers.add(observer);
+	}
+
+	public void notifyObservers() {
+		for (GObserver observer : observers) {
+			observer.update();
+		}
+	}
 
 }

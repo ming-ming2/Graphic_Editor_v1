@@ -3,7 +3,6 @@ package command;
 import java.util.HashMap;
 import java.util.Map;
 
-import dto.GCommandDTO;
 import type.GMode;
 
 public class GCommandManager {
@@ -13,7 +12,7 @@ public class GCommandManager {
 		commands.put(mode, command);
 	}
 
-	public void execute(GMode mode, GCommandDTO dto) {
-		commands.getOrDefault(mode, new DefaultCommand()).execute(dto);
+	public void execute(GMode mode) {
+		commands.getOrDefault(mode, new DefaultCommand()).execute();
 	}
 }

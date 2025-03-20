@@ -1,11 +1,9 @@
 package command;
 
-import dto.GCommandDTO;
-
-public class DefaultCommand implements GCommand<GCommandDTO> {
+public class DefaultCommand implements GCommand {
 
 	@Override
-	public void execute(GCommandDTO dto) {
+	public void execute() {
 		// 아무것도 하지않음
 	}
 }

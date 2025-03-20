@@ -14,7 +14,7 @@ import type.GMode;
 import type.GShapeType;
 
 // 현재는 하나의 클래스에서 전부 관리. 추후 분리 예정
-public class GDrawingStateManager implements GStateManager {
+public class GDrawingStateManager extends GStateManager {
 	// 단일 객체
 	private static GDrawingStateManager drawingStateManager;
 
@@ -92,15 +92,4 @@ public class GDrawingStateManager implements GStateManager {
 		notifyObservers();
 	}
 
-	@Override
-	public void addObserver(GObserver observer) {
-		observers.add(observer);
-	}
-
-	@Override
-	public void notifyObservers() {
-		for (GObserver observer : observers) {
-			observer.update();
-		}
-	}
 }
