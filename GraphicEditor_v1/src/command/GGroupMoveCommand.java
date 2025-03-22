@@ -1,9 +1,7 @@
 package command;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import shapes.GShape;
@@ -12,7 +10,7 @@ import state.GEventStateMananger;
 
 public class GGroupMoveCommand implements GCommand {
 	private Map<GShape, Point> originalPositions = new HashMap<>();
-	private Point originalDragStartPoint;
+	private boolean executed = false;
 
 	@Override
 	public void execute() {
@@ -20,13 +18,13 @@ public class GGroupMoveCommand implements GCommand {
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
 		if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
-			// 처음 실행 시 원래 위치와 시작점 저장
-			if (originalPositions.isEmpty() && originalDragStartPoint == null) {
-				originalDragStartPoint = new Point(drawingManager.getDragStartPoint());
-
+			// 최초 실행 시에만 원래 위치 저장
+			if (!executed) {
+				// 선택된 도형들의 원래 위치 저장
 				for (GShape shape : drawingManager.getSelectedShapes()) {
 					originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
 				}
+				executed = true;
 			}
 
 			Point currentPoint = eventManager.getCurrentPoint();
@@ -40,20 +38,18 @@ public class GGroupMoveCommand implements GCommand {
 	public void unexecute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 
-		// 드래그 시작점 복원
-		if (originalDragStartPoint != null) {
-			drawingManager.setDragStartPoint(originalDragStartPoint);
-		}
-
 		// 각 도형을 원래 위치로 복원
-		List<GShape> shapesToRestore = new ArrayList<>(originalPositions.keySet());
-		for (GShape shape : shapesToRestore) {
-			Point originalPos = originalPositions.get(shape);
-			if (originalPos != null) {
-				int dx = originalPos.x - shape.getBounds().x;
-				int dy = originalPos.y - shape.getBounds().y;
-				shape.move(dx, dy);
-			}
+		for (Map.Entry<GShape, Point> entry : originalPositions.entrySet()) {
+			GShape shape = entry.getKey();
+			Point originalPos = entry.getValue();
+
+			// 현재 위치 구하기
+			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
+
+			// 원래 위치로 이동
+			int dx = originalPos.x - currentPos.x;
+			int dy = originalPos.y - currentPos.y;
+			shape.move(dx, dy);
 		}
 
 		drawingManager.notifyObservers();

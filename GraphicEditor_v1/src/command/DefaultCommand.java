@@ -12,6 +12,7 @@ import state.GEventStateMananger;
 public class DefaultCommand implements GCommand {
 	private List<GShape> previouslySelectedShapes = new ArrayList<>();
 	private List<GShape> newlySelectedShapes = new ArrayList<>();
+	private boolean executed = false;
 
 	@Override
 	public void execute() {
@@ -30,9 +31,12 @@ public class DefaultCommand implements GCommand {
 
 		if (eventManager.isMouseReleased()) {
 			if (selectionArea.width > 5 && selectionArea.height > 5) {
-				// 이전 선택 상태 저장
-				previouslySelectedShapes.clear();
-				previouslySelectedShapes.addAll(drawingManager.getSelectedShapes());
+				// 최초 실행 시에만 이전 선택 상태 저장
+				if (!executed) {
+					previouslySelectedShapes.clear();
+					previouslySelectedShapes.addAll(drawingManager.getSelectedShapes());
+					executed = true;
+				}
 
 				if (!eventManager.isShiftDown()) {
 					drawingManager.clearSelection();

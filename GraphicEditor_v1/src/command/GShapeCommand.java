@@ -11,9 +11,17 @@ import type.GShapeType;
 
 public class GShapeCommand implements GCommand {
 	private GShape createdShape;
+	private boolean executed = false;
 
 	@Override
 	public void execute() {
+		if (executed && createdShape != null) {
+
+			GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
+			drawingManager.addShape(createdShape);
+			return;
+		}
+
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		List<MouseEvent> events = eventManager.getMouseEvents();
 
@@ -32,6 +40,7 @@ public class GShapeCommand implements GCommand {
 				drawingManager.addShape(shape);
 				drawingManager.setPreviewShape(null);
 				createdShape = shape;
+				executed = true;
 			} else {
 				drawingManager.setPreviewShape(shape);
 			}

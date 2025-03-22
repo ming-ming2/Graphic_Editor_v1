@@ -21,8 +21,9 @@ import command.GCommandManager;
 import file.GFileManager;
 import state.GDrawingStateManager;
 import state.GEventStateMananger;
+import state.GObserver;
 
-public class GMenuBar extends JMenuBar implements GContainerInterface {
+public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver {
 	private static final long serialVersionUID = 1L;
 
 	private JMenu fileMenu;
@@ -52,6 +53,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 	public GMenuBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		this.commandManager = GEventStateMananger.getInstance().getCommandManager();
+		this.commandManager.addObserver(this); // 옵저버로 등록
 	}
 
 	@Override
@@ -156,9 +158,20 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 		item.setFont(font);
 	}
 
+	@Override
+	public void update() {
+		updateUndoRedoState();
+	}
+
+	// GMenuBar.java에서 updateUndoRedoState 메서드
 	public void updateUndoRedoState() {
-		undoMenuItem.setEnabled(commandManager.canUndo());
-		redoMenuItem.setEnabled(commandManager.canRedo());
+		boolean canUndo = commandManager.canUndo();
+		boolean canRedo = commandManager.canRedo();
+
+		System.out.println("메뉴 상태 업데이트 - canUndo: " + canUndo + ", canRedo: " + canRedo);
+
+		undoMenuItem.setEnabled(canUndo);
+		redoMenuItem.setEnabled(canRedo);
 	}
 
 	@Override
@@ -248,7 +261,9 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 
 		exitMenuItem.addActionListener(e -> System.exit(0));
 
+		// addEventHandler 메서드 내부에서
 		undoMenuItem.addActionListener(e -> {
+			System.out.println("Undo 메뉴 클릭됨");
 			if (commandManager.canUndo()) {
 				commandManager.undo();
 				updateUndoRedoState();
@@ -256,6 +271,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 		});
 
 		redoMenuItem.addActionListener(e -> {
+			System.out.println("Redo 메뉴 클릭됨");
 			if (commandManager.canRedo()) {
 				commandManager.redo();
 				updateUndoRedoState();
