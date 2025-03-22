@@ -9,9 +9,6 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import state.GDrawingStateManager;
-import state.GEventStateMananger;
-
 public class GMainFrame extends JFrame implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
@@ -21,7 +18,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	private List<GContainerInterface> components = new ArrayList<>();
 
 	public GMainFrame() {
-		initializeStateManagers();
+
 	}
 
 	@Override
@@ -48,7 +45,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	public void setAttributes() {
 		this.setTitle("Graphic Editor_V1");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setSize((int) (dim.width / 2.), dim.height / 2);
+		this.setSize((int) (dim.width / 2.), dim.height * 2 / 3);
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -69,11 +66,6 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		for (GContainerInterface component : components) {
 			component.initialize();
 		}
-	}
-
-	private void initializeStateManagers() {
-		GDrawingStateManager.getInstance();
-		GEventStateMananger.getInstance();
 	}
 
 }

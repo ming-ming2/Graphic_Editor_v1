@@ -21,7 +21,6 @@ public class GStar extends GShape {
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
 
-		// 가로 세로 반지름을 별도로 사용
 		int outerRadiusX = width / 2;
 		int outerRadiusY = height / 2;
 		int innerRadiusX = outerRadiusX / 2;
@@ -34,8 +33,6 @@ public class GStar extends GShape {
 
 		for (int i = 0; i < points * 2; i++) {
 			double angle = Math.PI / points * i - Math.PI / 2;
-
-			// 짝수 인덱스는 외부 점, 홀수 인덱스는 내부 점
 			int radiusX = (i % 2 == 0) ? outerRadiusX : innerRadiusX;
 			int radiusY = (i % 2 == 0) ? outerRadiusY : innerRadiusY;
 

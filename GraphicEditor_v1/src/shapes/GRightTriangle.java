@@ -18,15 +18,9 @@ public class GRightTriangle extends GShape {
 	}
 
 	private void updatePolygon() {
-		int[] xPoints = { point.x, // 좌측 상단 (직각)
-				point.x + width, // 우측 상단
-				point.x // 좌측 하단
-		};
+		int[] xPoints = { point.x, point.x + width, point.x };
 
-		int[] yPoints = { point.y, // 좌측 상단 (직각)
-				point.y, // 우측 상단
-				point.y + height// 좌측 하단
-		};
+		int[] yPoints = { point.y, point.y, point.y + height };
 
 		trianglePolygon = new Polygon(xPoints, yPoints, 3);
 	}

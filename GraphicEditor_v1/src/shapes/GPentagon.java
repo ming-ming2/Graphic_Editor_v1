@@ -24,7 +24,6 @@ public class GPentagon extends GShape {
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
 
-		// 가로 세로 반지름을 별도로 사용
 		int radiusX = width / 2;
 		int radiusY = height / 2;
 

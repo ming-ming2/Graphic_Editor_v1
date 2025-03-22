@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import command.GCommandManager;
-import eventhandler.DefaultHandler;
+import eventhandler.GDefaultHandler;
 import eventhandler.GMouseEventHandler;
 import eventhandler.GMouseEventHandlerRegistry;
 import type.GMode;
@@ -26,7 +26,7 @@ public class GEventStateMananger extends GStateManager {
 	private GEventStateMananger() {
 		this.commandManager = new GCommandManager();
 		this.mouserEventHandlerRegistry = new GMouseEventHandlerRegistry(commandManager);
-		this.currentMouseEventHandler = new DefaultHandler(commandManager);
+		this.currentMouseEventHandler = new GDefaultHandler(commandManager);
 		mouseEvents = null;
 		currentPoint = null;
 		previousPoint = null;
@@ -84,7 +84,6 @@ public class GEventStateMananger extends GStateManager {
 		return new Point(0, 0);
 	}
 
-	// 추가된 메서드들
 	public void setSelectionStartPoint(Point point) {
 		this.selectionStartPoint = point;
 	}

@@ -41,7 +41,6 @@ public class GLine extends GShape {
 		int width = Math.abs(endPoint.x - point.x);
 		int height = Math.abs(endPoint.y - point.y);
 
-		// 선의 경우 두께가 없으므로 최소 크기 보장
 		if (width == 0)
 			width = 1;
 		if (height == 0)

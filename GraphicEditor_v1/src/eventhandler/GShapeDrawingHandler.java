@@ -19,19 +19,15 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		startEvent = e;
-		// 추가: 이벤트 상태 관리자에 드래그 시작점 저장
 		GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (startEvent != null) {
-			// 이벤트 상태 관리자에 정보 저장
 			List<MouseEvent> events = createMouseEvents(e);
 			GEventStateMananger.getInstance().setMouseEvents(events);
 			GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
-
-			// 커맨드에 작업 위임
 			commandManager.execute(GMode.SHAPE);
 		}
 	}
@@ -39,12 +35,9 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (startEvent != null) {
-			// 이벤트 상태 관리자에 정보 저장
 			List<MouseEvent> events = createMouseEvents(e);
 			GEventStateMananger.getInstance().setMouseEvents(events);
 			GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
-
-			// 커맨드에 작업 위임
 			commandManager.execute(GMode.SHAPE);
 		}
 	}

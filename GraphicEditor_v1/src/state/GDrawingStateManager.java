@@ -13,10 +13,6 @@ public class GDrawingStateManager extends GStateManager {
 	// 단일 객체
 	private static GDrawingStateManager drawingStateManager;
 
-	// commandManager 생성
-
-	// DrawingPanel에 적용되는 state
-
 	private GMode currentMode;
 	private GShapeType currentShapeType;
 	private GShape previewShape;
@@ -28,7 +24,7 @@ public class GDrawingStateManager extends GStateManager {
 	private boolean isDraggingSelection = false;
 
 	private GDrawingStateManager() {
-		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다this.commandManager = new GCommandManager();
+		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다
 		this.currentMode = GMode.DEFAULT;
 		this.currentMode = null;
 		this.previewShape = null;
@@ -76,7 +72,6 @@ public class GDrawingStateManager extends GStateManager {
 		notifyObservers();
 	}
 
-	// 선택 영역 관련 메서드
 	public void setSelectionArea(Rectangle area) {
 		this.selectionArea = area;
 		notifyObservers();
@@ -86,7 +81,6 @@ public class GDrawingStateManager extends GStateManager {
 		return selectionArea;
 	}
 
-	// 선택된 도형들 관리
 	public List<GShape> getSelectedShapes() {
 		return selectedShapes;
 	}
@@ -128,7 +122,6 @@ public class GDrawingStateManager extends GStateManager {
 		}
 	}
 
-	// 드래그 시작점 관리
 	public void setDragStartPoint(Point point) {
 		this.dragStartPoint = point;
 	}
@@ -137,7 +130,6 @@ public class GDrawingStateManager extends GStateManager {
 		return dragStartPoint;
 	}
 
-	// 드래그 중인지 여부
 	public boolean isDraggingSelection() {
 		return isDraggingSelection;
 	}
@@ -146,7 +138,6 @@ public class GDrawingStateManager extends GStateManager {
 		this.isDraggingSelection = dragging;
 	}
 
-	// 선택된 도형들 이동
 	public void moveSelectedShapes(int dx, int dy) {
 		for (GShape shape : selectedShapes) {
 			shape.move(dx, dy);
@@ -154,9 +145,7 @@ public class GDrawingStateManager extends GStateManager {
 		notifyObservers();
 	}
 
-	// 도형 하나 찾기 (클릭 위치에 있는)
 	public GShape findShapeAt(Point point) {
-		// 역순으로 검색 (나중에 그려진 도형이 위에 있으므로)
 		for (int i = shapes.size() - 1; i >= 0; i--) {
 			GShape shape = shapes.get(i);
 			if (shape.contains(point)) {
@@ -164,5 +153,20 @@ public class GDrawingStateManager extends GStateManager {
 			}
 		}
 		return null;
+	}
+
+	public void moveSelectedShapesToPosition(Point newPosition) {
+		if (dragStartPoint == null || selectedShapes.isEmpty()) {
+			return;
+		}
+
+		int dx = newPosition.x - dragStartPoint.x;
+		int dy = newPosition.y - dragStartPoint.y;
+
+		for (GShape shape : selectedShapes) {
+			shape.move(dx, dy);
+		}
+		dragStartPoint = newPosition;
+		notifyObservers();
 	}
 }

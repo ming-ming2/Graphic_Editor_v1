@@ -15,6 +15,6 @@ public class GCommandManager {
 	}
 
 	public void execute(GMode mode) {
-		commands.getOrDefault(mode, new DefaultCommand()).execute();
+		commands.get(mode).execute();
 	}
 }

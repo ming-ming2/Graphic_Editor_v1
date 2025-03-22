@@ -18,17 +18,9 @@ public class GDiamond extends GShape {
 	}
 
 	private void updatePolygon() {
-		int[] xPoints = { point.x + width / 2, // 상단 중앙
-				point.x + width, // 우측 중앙
-				point.x + width / 2, // 하단 중앙
-				point.x // 좌측 중앙
-		};
+		int[] xPoints = { point.x + width / 2, point.x + width, point.x + width / 2, point.x };
 
-		int[] yPoints = { point.y, // 상단 중앙
-				point.y + height / 2, // 우측 중앙
-				point.y + height, // 하단 중앙
-				point.y + height / 2 // 좌측 중앙
-		};
+		int[] yPoints = { point.y, point.y + height / 2, point.y + height, point.y + height / 2 };
 
 		diamondPolygon = new Polygon(xPoints, yPoints, 4);
 	}

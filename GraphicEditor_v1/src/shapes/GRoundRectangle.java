@@ -7,7 +7,7 @@ import java.awt.Rectangle;
 public class GRoundRectangle extends GShape {
 	private int width;
 	private int height;
-	private final int arcSize = 20; // 둥근 모서리의 크기
+	private final int arcSize = 20;
 
 	public GRoundRectangle(Point point, int width, int height) {
 		this.point = point;
@@ -42,13 +42,9 @@ public class GRoundRectangle extends GShape {
 
 	@Override
 	public boolean contains(Point p) {
-		// 기본적으로 사각형 영역 체크
 		if (!getBounds().contains(p)) {
 			return false;
 		}
-
-		// 모서리 부분은 더 정확한 계산이 필요할 수 있으나,
-		// 단순화를 위해 사각형 영역으로 처리
 		return true;
 	}
 }
