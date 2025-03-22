@@ -36,6 +36,8 @@ public class GGroupMoveHandler implements GMouseEventHandler {
 			commandManager.executeAndStore(GMode.GROUP_MOVE);
 		}
 
+		// 선택 영역 명시적으로 초기화
+		drawingManager.setSelectionArea(null);
 		drawingManager.setDraggingSelection(false);
 		drawingManager.setCurrentMode(GMode.DEFAULT);
 	}

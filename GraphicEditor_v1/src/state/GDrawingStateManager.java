@@ -179,4 +179,18 @@ public class GDrawingStateManager extends GStateManager {
 		return null;
 	}
 
+	public void moveSelectedShapesToPosition(Point newPosition) {
+		if (dragStartPoint == null || selectedShapes.isEmpty()) {
+			return;
+		}
+
+		int dx = newPosition.x - dragStartPoint.x;
+		int dy = newPosition.y - dragStartPoint.y;
+
+		for (GShape shape : selectedShapes) {
+			shape.move(dx, dy);
+		}
+		dragStartPoint = newPosition;
+		notifyObservers();
+	}
 }

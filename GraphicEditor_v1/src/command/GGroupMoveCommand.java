@@ -12,8 +12,7 @@ import state.GEventStateMananger;
 
 public class GGroupMoveCommand implements GCommand {
 	private Map<GShape, Point> originalPositions = new HashMap<>();
-	private int deltaX;
-	private int deltaY;
+	private Point originalDragStartPoint;
 
 	@Override
 	public void execute() {
@@ -21,25 +20,18 @@ public class GGroupMoveCommand implements GCommand {
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
 		if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
-			Point currentPoint = eventManager.getCurrentPoint();
-			Point previousPoint = eventManager.getPreviousPoint();
-
-			if (currentPoint != null && previousPoint != null) {
-
-				if (originalPositions.isEmpty()) {
-					for (GShape shape : drawingManager.getSelectedShapes()) {
-						originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
-					}
-				}
-
-				deltaX = currentPoint.x - previousPoint.x;
-				deltaY = currentPoint.y - previousPoint.y;
+			// 처음 실행 시 원래 위치와 시작점 저장
+			if (originalPositions.isEmpty() && originalDragStartPoint == null) {
+				originalDragStartPoint = new Point(drawingManager.getDragStartPoint());
 
 				for (GShape shape : drawingManager.getSelectedShapes()) {
-					shape.move(deltaX, deltaY);
+					originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
 				}
+			}
 
-				drawingManager.notifyObservers();
+			Point currentPoint = eventManager.getCurrentPoint();
+			if (currentPoint != null) {
+				drawingManager.moveSelectedShapesToPosition(currentPoint);
 			}
 		}
 	}
@@ -47,16 +39,21 @@ public class GGroupMoveCommand implements GCommand {
 	@Override
 	public void unexecute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
-		List<GShape> shapesToRestore = new ArrayList<>(originalPositions.keySet());
 
+		// 드래그 시작점 복원
+		if (originalDragStartPoint != null) {
+			drawingManager.setDragStartPoint(originalDragStartPoint);
+		}
+
+		// 각 도형을 원래 위치로 복원
+		List<GShape> shapesToRestore = new ArrayList<>(originalPositions.keySet());
 		for (GShape shape : shapesToRestore) {
 			Point originalPos = originalPositions.get(shape);
-			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
-
-			int dx = originalPos.x - currentPos.x;
-			int dy = originalPos.y - currentPos.y;
-
-			shape.move(dx, dy);
+			if (originalPos != null) {
+				int dx = originalPos.x - shape.getBounds().x;
+				int dy = originalPos.y - shape.getBounds().y;
+				shape.move(dx, dy);
+			}
 		}
 
 		drawingManager.notifyObservers();

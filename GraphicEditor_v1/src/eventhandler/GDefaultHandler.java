@@ -42,7 +42,6 @@ public class GDefaultHandler implements GMouseEventHandler {
 		}
 
 		drawingStateManager.setSelectionArea(new Rectangle(startPoint.x, startPoint.y, 0, 0));
-		isMovingShape = false;
 	}
 
 	@Override
@@ -53,11 +52,14 @@ public class GDefaultHandler implements GMouseEventHandler {
 
 		if (isMovingShape) {
 			drawingStateManager.setDraggingSelection(false);
+			commandManager.executeAndStore(GMode.GROUP_MOVE);
 			drawingStateManager.setCurrentMode(GMode.DEFAULT);
 		} else if (startPoint != null) {
 			commandManager.executeAndStore(GMode.DEFAULT);
 		}
 
+		// 선택 영역 명시적으로 초기화
+		drawingStateManager.setSelectionArea(null);
 		isMovingShape = false;
 		clickedShape = null;
 		startPoint = null;
