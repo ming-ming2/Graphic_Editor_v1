@@ -20,8 +20,13 @@ public class GStar extends GShape {
 	private void updatePolygon() {
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
-		int outerRadius = Math.min(width, height) / 2;
-		int innerRadius = outerRadius / 2;
+
+		// 가로 세로 반지름을 별도로 사용
+		int outerRadiusX = width / 2;
+		int outerRadiusY = height / 2;
+		int innerRadiusX = outerRadiusX / 2;
+		int innerRadiusY = outerRadiusY / 2;
+
 		int points = 5;
 
 		int[] xPoints = new int[points * 2];
@@ -29,10 +34,13 @@ public class GStar extends GShape {
 
 		for (int i = 0; i < points * 2; i++) {
 			double angle = Math.PI / points * i - Math.PI / 2;
-			int radius = (i % 2 == 0) ? outerRadius : innerRadius;
 
-			xPoints[i] = (int) (centerX + radius * Math.cos(angle));
-			yPoints[i] = (int) (centerY + radius * Math.sin(angle));
+			// 짝수 인덱스는 외부 점, 홀수 인덱스는 내부 점
+			int radiusX = (i % 2 == 0) ? outerRadiusX : innerRadiusX;
+			int radiusY = (i % 2 == 0) ? outerRadiusY : innerRadiusY;
+
+			xPoints[i] = (int) (centerX + radiusX * Math.cos(angle));
+			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
 		starPolygon = new Polygon(xPoints, yPoints, points * 2);
@@ -44,7 +52,7 @@ public class GStar extends GShape {
 		g.drawPolygon(starPolygon);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

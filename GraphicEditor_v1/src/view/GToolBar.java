@@ -316,28 +316,38 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		g2d.drawPolygon(xPoints, yPoints, 3);
 	}
 
+	// GToolBar 클래스의 기존 drawPolygon 메서드를 수정
 	private void drawPolygon(Graphics2D g2d, int x, int y, int width, int height, int sides) {
 		int[] xPoints = new int[sides];
 		int[] yPoints = new int[sides];
 
 		int centerX = x + width / 2;
 		int centerY = y + height / 2;
-		int radius = Math.min(width, height) / 2;
+
+		// 타원형 기반으로 다각형 그리기
+		int radiusX = width / 2;
+		int radiusY = height / 2;
 
 		for (int i = 0; i < sides; i++) {
 			double angle = 2 * Math.PI * i / sides - Math.PI / 2;
-			xPoints[i] = (int) (centerX + radius * Math.cos(angle));
-			yPoints[i] = (int) (centerY + radius * Math.sin(angle));
+			xPoints[i] = (int) (centerX + radiusX * Math.cos(angle));
+			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
 		g2d.drawPolygon(xPoints, yPoints, sides);
 	}
 
+	// GToolBar 클래스의 기존 drawStar 메서드를 수정
 	private void drawStar(Graphics2D g2d, int x, int y, int width, int height) {
 		int centerX = x + width / 2;
 		int centerY = y + height / 2;
-		int outerRadius = Math.min(width, height) / 2;
-		int innerRadius = outerRadius / 2;
+
+		// 타원형 기반으로 별 그리기
+		int outerRadiusX = width / 2;
+		int outerRadiusY = height / 2;
+		int innerRadiusX = outerRadiusX / 2;
+		int innerRadiusY = outerRadiusY / 2;
+
 		int points = 5;
 
 		int[] xPoints = new int[points * 2];
@@ -345,10 +355,11 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 
 		for (int i = 0; i < points * 2; i++) {
 			double angle = Math.PI / points * i - Math.PI / 2;
-			int radius = (i % 2 == 0) ? outerRadius : innerRadius;
+			int radiusX = (i % 2 == 0) ? outerRadiusX : innerRadiusX;
+			int radiusY = (i % 2 == 0) ? outerRadiusY : innerRadiusY;
 
-			xPoints[i] = (int) (centerX + radius * Math.cos(angle));
-			yPoints[i] = (int) (centerY + radius * Math.sin(angle));
+			xPoints[i] = (int) (centerX + radiusX * Math.cos(angle));
+			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
 		g2d.drawPolygon(xPoints, yPoints, points * 2);

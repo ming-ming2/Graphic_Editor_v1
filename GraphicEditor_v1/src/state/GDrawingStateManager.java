@@ -5,12 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import command.DefaultCommand;
 import command.GCommandManager;
-import command.GGroupMoveCommand;
-import command.GGroupSelectionCommand;
-import command.GShapeCommand;
-import eventhandler.DefaultHandler;
 import eventhandler.GMouseEventHandler;
 import eventhandler.GMouseEventHandlerRegistry;
 import shapes.GShape;
@@ -21,40 +16,29 @@ public class GDrawingStateManager extends GStateManager {
 	// 단일 객체
 	private static GDrawingStateManager drawingStateManager;
 
-	private List<GObserver> observers = new ArrayList<>();
 	// commandManager 생성
-	GCommandManager commandManager = new GCommandManager();
+	private GCommandManager commandManager;
 	private GMouseEventHandlerRegistry mouserEventHandlerRegistry;
+
 	// DrawingPanel에 적용되는 state
 	private GMouseEventHandler currentMouseEventHandler;
 	private GMode currentMode;
 	private GShapeType currentShapeType;
-	private List<GShape> shapes;
 	private GShape previewShape;
-
+	private List<GShape> shapes = new ArrayList<>();
 	// 그룹 선택 관련 필드 추가
 	private Rectangle selectionArea;
-	private List<GShape> selectedShapes;
+	private List<GShape> selectedShapes = new ArrayList<>();
 	private Point dragStartPoint;
 	private boolean isDraggingSelection = false;
 
 	private GDrawingStateManager() {
 		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다
-		this.commandManager.add(GMode.DEFAULT, new DefaultCommand());
-		this.commandManager.add(GMode.SHAPE, new GShapeCommand());
-		this.commandManager.add(GMode.SELECTION, new GGroupSelectionCommand());
-		this.commandManager.add(GMode.GROUP_MOVE, new GGroupMoveCommand());
-
-		// 초기화 순서 변경
-		this.currentMode = GMode.DEFAULT;
-		this.currentShapeType = null;
-		this.shapes = new ArrayList<>();
-		this.previewShape = null;
-		this.selectedShapes = new ArrayList<>();
-
-		// 순환 참조가 발생하지 않도록 마지막에 초기화
+		this.commandManager = new GCommandManager();
 		this.mouserEventHandlerRegistry = new GMouseEventHandlerRegistry(commandManager);
-		this.currentMouseEventHandler = new DefaultHandler(commandManager);
+		this.setCurrentMode(GMode.DEFAULT);
+		this.setCurrentShapeType(null);
+		this.setPreviewShape(null);
 	}
 
 	public static GDrawingStateManager getInstance() {

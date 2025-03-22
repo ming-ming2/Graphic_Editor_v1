@@ -37,7 +37,7 @@ public class GRightTriangle extends GShape {
 		g.drawPolygon(trianglePolygon);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

@@ -19,7 +19,7 @@ public class GRectangle extends GShape {
 		g.drawRect(point.x, point.y, width, height);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

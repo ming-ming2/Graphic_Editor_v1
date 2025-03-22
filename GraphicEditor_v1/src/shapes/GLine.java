@@ -17,7 +17,7 @@ public class GLine extends GShape {
 		g.drawLine(point.x, point.y, endPoint.x, endPoint.y);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

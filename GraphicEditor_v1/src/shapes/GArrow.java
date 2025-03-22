@@ -29,7 +29,7 @@ public class GArrow extends GShape {
 		g.drawLine(endPoint.x, endPoint.y, x2, y2);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

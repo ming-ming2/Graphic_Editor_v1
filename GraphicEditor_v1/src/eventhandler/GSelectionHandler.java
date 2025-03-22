@@ -10,12 +10,10 @@ import type.GMode;
 
 public class GSelectionHandler implements GMouseEventHandler {
 	private Point startPoint;
-	private GDrawingStateManager drawingStateManager;
 	private GCommandManager commandManager;
 
 	public GSelectionHandler(GCommandManager commandManager) {
 		this.commandManager = commandManager;
-		this.drawingStateManager = GDrawingStateManager.getInstance();
 	}
 
 	@Override
@@ -23,10 +21,10 @@ public class GSelectionHandler implements GMouseEventHandler {
 		startPoint = e.getPoint();
 
 		// 기존 선택 초기화
-		drawingStateManager.clearSelection();
+		GDrawingStateManager.getInstance().clearSelection();
 
 		// 선택 영역 초기화
-		drawingStateManager.setSelectionArea(new Rectangle(startPoint.x, startPoint.y, 0, 0));
+		GDrawingStateManager.getInstance().setSelectionArea(new Rectangle(startPoint.x, startPoint.y, 0, 0));
 	}
 
 	@Override
@@ -34,13 +32,13 @@ public class GSelectionHandler implements GMouseEventHandler {
 		if (startPoint != null) {
 			// 선택 영역 생성
 			Rectangle selectionArea = createSelectionRectangle(e.getPoint());
-			drawingStateManager.setSelectionArea(selectionArea);
+			GDrawingStateManager.getInstance().setSelectionArea(selectionArea);
 
 			// 명령 실행 (선택 영역 내 도형 선택)
 			commandManager.execute(GMode.SELECTION);
 
 			// 선택 완료 후 기본 모드로 돌아가기
-			drawingStateManager.setCurrentMode(GMode.DEFAULT);
+			GDrawingStateManager.getInstance().setCurrentMode(GMode.DEFAULT);
 		}
 	}
 
@@ -49,7 +47,7 @@ public class GSelectionHandler implements GMouseEventHandler {
 		if (startPoint != null) {
 			// 선택 영역 업데이트
 			Rectangle selectionArea = createSelectionRectangle(e.getPoint());
-			drawingStateManager.setSelectionArea(selectionArea);
+			GDrawingStateManager.getInstance().setSelectionArea(selectionArea);
 		}
 	}
 

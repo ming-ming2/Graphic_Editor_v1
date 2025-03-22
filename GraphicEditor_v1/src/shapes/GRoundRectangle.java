@@ -20,7 +20,7 @@ public class GRoundRectangle extends GShape {
 		g.drawRoundRect(point.x, point.y, width, height, arcSize, arcSize);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

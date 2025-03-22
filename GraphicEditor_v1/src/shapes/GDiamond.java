@@ -39,7 +39,7 @@ public class GDiamond extends GShape {
 		g.drawPolygon(diamondPolygon);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

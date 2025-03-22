@@ -23,12 +23,15 @@ public class GHexagon extends GShape {
 
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
-		int radius = Math.min(width, height) / 2;
+
+		// 가로 세로 반지름을 별도로 사용
+		int radiusX = width / 2;
+		int radiusY = height / 2;
 
 		for (int i = 0; i < 6; i++) {
 			double angle = 2 * Math.PI * i / 6;
-			xPoints[i] = (int) (centerX + radius * Math.cos(angle));
-			yPoints[i] = (int) (centerY + radius * Math.sin(angle));
+			xPoints[i] = (int) (centerX + radiusX * Math.cos(angle));
+			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
 		hexagonPolygon = new Polygon(xPoints, yPoints, 6);
@@ -40,7 +43,7 @@ public class GHexagon extends GShape {
 		g.drawPolygon(hexagonPolygon);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 

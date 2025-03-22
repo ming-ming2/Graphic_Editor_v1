@@ -19,7 +19,7 @@ public class GOval extends GShape {
 		g.drawOval(point.x, point.y, width, height);
 
 		if (isSelected) {
-			drawSelectionMarkers(g);
+			drawSelectionBox(g);
 		}
 	}
 
