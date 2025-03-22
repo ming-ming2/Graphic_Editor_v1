@@ -29,9 +29,9 @@ public class GDrawingStateManager extends GStateManager {
 
 	private GDrawingStateManager() {
 		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다this.commandManager = new GCommandManager();
-		this.setCurrentMode(GMode.DEFAULT);
-		this.setCurrentShapeType(null);
-		this.setPreviewShape(null);
+		this.currentMode = GMode.DEFAULT;
+		this.currentMode = null;
+		this.previewShape = null;
 	}
 
 	public static GDrawingStateManager getInstance() {

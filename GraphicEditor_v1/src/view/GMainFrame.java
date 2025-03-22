@@ -21,12 +21,11 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	private List<GContainerInterface> components = new ArrayList<>();
 
 	public GMainFrame() {
-
+		initializeStateManagers();
 	}
 
 	@Override
 	public void createComponents() {
-		initializeStateManagers();
 		this.drawingPanel = new GDrawingPanel();
 		this.toolBar = new GToolBar();
 		this.menuBar = new GMenuBar();

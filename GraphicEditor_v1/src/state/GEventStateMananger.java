@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import command.GCommandManager;
+import eventhandler.DefaultHandler;
 import eventhandler.GMouseEventHandler;
 import eventhandler.GMouseEventHandlerRegistry;
 import type.GMode;
@@ -25,6 +26,7 @@ public class GEventStateMananger extends GStateManager {
 	private GEventStateMananger() {
 		this.commandManager = new GCommandManager();
 		this.mouserEventHandlerRegistry = new GMouseEventHandlerRegistry(commandManager);
+		this.currentMouseEventHandler = new DefaultHandler(commandManager);
 		mouseEvents = null;
 		currentPoint = null;
 		previousPoint = null;
