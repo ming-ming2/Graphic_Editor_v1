@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 public class GArrow extends GShape {
+	private static final long serialVersionUID = 1L;
 	private Point endPoint;
 	private final int ARROW_SIZE = 10;
 

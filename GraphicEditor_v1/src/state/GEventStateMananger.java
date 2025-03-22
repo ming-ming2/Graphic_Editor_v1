@@ -51,7 +51,12 @@ public class GEventStateMananger extends GStateManager {
 		return currentMouseEventHandler;
 	}
 
+	public GCommandManager getCommandManager() {
+		return this.commandManager;
+	}
+
 	public void setCurrentMouseEventHandler(GMode mode) {
+		System.out.println("모드 변경 : " + this.currentMouseEventHandler + " -> " + mode);
 		this.currentMouseEventHandler = mouserEventHandlerRegistry.get(mode);
 	}
 

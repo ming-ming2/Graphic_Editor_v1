@@ -6,6 +6,8 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 
 public class GHexagon extends GShape {
+
+	private static final long serialVersionUID = 1L;
 	private int width;
 	private int height;
 	private Polygon hexagonPolygon;

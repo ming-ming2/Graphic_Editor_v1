@@ -38,7 +38,6 @@ public class GDefaultHandler implements GMouseEventHandler {
 			drawingStateManager.setDraggingSelection(true);
 			drawingStateManager.setCurrentMode(GMode.GROUP_MOVE);
 		} else if (!e.isShiftDown()) {
-
 			drawingStateManager.clearSelection();
 		}
 
@@ -56,7 +55,7 @@ public class GDefaultHandler implements GMouseEventHandler {
 			drawingStateManager.setDraggingSelection(false);
 			drawingStateManager.setCurrentMode(GMode.DEFAULT);
 		} else if (startPoint != null) {
-			commandManager.execute(GMode.DEFAULT);
+			commandManager.executeAndStore(GMode.DEFAULT);
 		}
 
 		isMovingShape = false;

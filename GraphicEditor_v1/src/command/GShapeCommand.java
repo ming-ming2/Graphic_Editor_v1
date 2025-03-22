@@ -10,6 +10,8 @@ import state.GEventStateMananger;
 import type.GShapeType;
 
 public class GShapeCommand implements GCommand {
+	private GShape createdShape;
+
 	@Override
 	public void execute() {
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
@@ -18,12 +20,10 @@ public class GShapeCommand implements GCommand {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GShapeType shapeType = drawingManager.getCurrentShapeType();
 
-		// 유효성 검사
 		if (events == null || events.size() < 2 || shapeType == null) {
 			return;
 		}
 
-		// 도형 생성
 		GShape shape = GShapeFactory.getShape(shapeType, events);
 
 		if (shape != null) {
@@ -31,9 +31,18 @@ public class GShapeCommand implements GCommand {
 			if (lastEvent.getID() == MouseEvent.MOUSE_RELEASED) {
 				drawingManager.addShape(shape);
 				drawingManager.setPreviewShape(null);
+				createdShape = shape;
 			} else {
 				drawingManager.setPreviewShape(shape);
 			}
+		}
+	}
+
+	@Override
+	public void unexecute() {
+		if (createdShape != null) {
+			GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
+			drawingManager.removeShape(createdShape);
 		}
 	}
 }

@@ -31,6 +31,11 @@ public class GGroupMoveHandler implements GMouseEventHandler {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		eventManager.setCurrentPoint(e.getPoint());
+
+		if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
+			commandManager.executeAndStore(GMode.GROUP_MOVE);
+		}
+
 		drawingManager.setDraggingSelection(false);
 		drawingManager.setCurrentMode(GMode.DEFAULT);
 	}

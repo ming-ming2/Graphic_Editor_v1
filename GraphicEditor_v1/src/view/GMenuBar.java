@@ -17,8 +17,10 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import command.GCommandManager;
 import file.GFileManager;
 import state.GDrawingStateManager;
+import state.GEventStateMananger;
 
 public class GMenuBar extends JMenuBar implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
@@ -45,9 +47,11 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 	private JMenuItem zoomOutMenuItem;
 
 	private GDrawingPanel drawingPanel;
+	private GCommandManager commandManager;
 
 	public GMenuBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
+		this.commandManager = GEventStateMananger.getInstance().getCommandManager();
 	}
 
 	@Override
@@ -144,10 +148,17 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 
 		setMenuItemFont(zoomInMenuItem, menuFont);
 		setMenuItemFont(zoomOutMenuItem, menuFont);
+
+		updateUndoRedoState();
 	}
 
 	private void setMenuItemFont(JMenuItem item, Font font) {
 		item.setFont(font);
+	}
+
+	public void updateUndoRedoState() {
+		undoMenuItem.setEnabled(commandManager.canUndo());
+		redoMenuItem.setEnabled(commandManager.canRedo());
 	}
 
 	@Override
@@ -163,10 +174,8 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 			File currentFile = GDrawingStateManager.getInstance().getCurrentFile();
 
 			if (currentFile != null) {
-				// 이미 열려있는 파일이 있으면 그 파일에 바로 저장
 				GFileManager.saveToFile(currentFile);
 			} else {
-				// 열려있는 파일이 없으면 다른 이름으로 저장과 동일하게 동작
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileFilter(new FileNameExtensionFilter("Graphic Editor Files (*.ged)", "ged"));
 
@@ -239,11 +248,23 @@ public class GMenuBar extends JMenuBar implements GContainerInterface {
 
 		exitMenuItem.addActionListener(e -> System.exit(0));
 
+		undoMenuItem.addActionListener(e -> {
+			if (commandManager.canUndo()) {
+				commandManager.undo();
+				updateUndoRedoState();
+			}
+		});
+
+		redoMenuItem.addActionListener(e -> {
+			if (commandManager.canRedo()) {
+				commandManager.redo();
+				updateUndoRedoState();
+			}
+		});
+
 		cutMenuItem.addActionListener(dummyAction);
 		copyMenuItem.addActionListener(dummyAction);
 		pasteMenuItem.addActionListener(dummyAction);
-		undoMenuItem.addActionListener(dummyAction);
-		redoMenuItem.addActionListener(dummyAction);
 
 		zoomInMenuItem.addActionListener(dummyAction);
 		zoomOutMenuItem.addActionListener(dummyAction);

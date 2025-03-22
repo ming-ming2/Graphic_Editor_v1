@@ -107,6 +107,16 @@ public class GDrawingStateManager extends GStateManager {
 		notifyObservers();
 	}
 
+	public void removeShape(GShape shape) {
+		if (shapes.contains(shape)) {
+			if (shape.isSelected()) {
+				removeFromSelection(shape);
+			}
+			shapes.remove(shape);
+			notifyObservers();
+		}
+	}
+
 	public void addToSelection(GShape shape) {
 		if (!selectedShapes.contains(shape)) {
 			shape.setSelected(true);
@@ -169,18 +179,4 @@ public class GDrawingStateManager extends GStateManager {
 		return null;
 	}
 
-	public void moveSelectedShapesToPosition(Point newPosition) {
-		if (dragStartPoint == null || selectedShapes.isEmpty()) {
-			return;
-		}
-
-		int dx = newPosition.x - dragStartPoint.x;
-		int dy = newPosition.y - dragStartPoint.y;
-
-		for (GShape shape : selectedShapes) {
-			shape.move(dx, dy);
-		}
-		dragStartPoint = newPosition;
-		notifyObservers();
-	}
 }
