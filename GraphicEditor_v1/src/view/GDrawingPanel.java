@@ -56,7 +56,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					eventStateManager.setCurrentPoint(e.getPoint());
-					drawingStateManager.getCurrentMouseEventHandler().mousePressed(e);
+					eventStateManager.getCurrentMouseEventHandler().mousePressed(e);
 					isDragging = true;
 				}
 			}
@@ -65,7 +65,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1 && isDragging) {
 					eventStateManager.setCurrentPoint(e.getPoint());
-					drawingStateManager.getCurrentMouseEventHandler().mouseReleased(e);
+					eventStateManager.getCurrentMouseEventHandler().mouseReleased(e);
 					isDragging = false;
 				}
 			}
@@ -76,7 +76,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			public void mouseDragged(MouseEvent e) {
 				if (isDragging) {
 					eventStateManager.setCurrentPoint(e.getPoint());
-					drawingStateManager.getCurrentMouseEventHandler().mouseDragged(e);
+					eventStateManager.getCurrentMouseEventHandler().mouseDragged(e);
 				}
 			}
 

@@ -9,6 +9,9 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import state.GDrawingStateManager;
+import state.GEventStateMananger;
+
 public class GMainFrame extends JFrame implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
 
@@ -23,6 +26,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 
 	@Override
 	public void createComponents() {
+		initializeStateManagers();
 		this.drawingPanel = new GDrawingPanel();
 		this.toolBar = new GToolBar();
 		this.menuBar = new GMenuBar();
@@ -66,6 +70,11 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		for (GContainerInterface component : components) {
 			component.initialize();
 		}
+	}
+
+	private void initializeStateManagers() {
+		GDrawingStateManager.getInstance();
+		GEventStateMananger.getInstance();
 	}
 
 }

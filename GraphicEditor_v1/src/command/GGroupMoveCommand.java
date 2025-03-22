@@ -11,6 +11,7 @@ public class GGroupMoveCommand implements GCommand {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
+		// 도형 이동 중인지 확인
 		if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
 			// 현재 마우스 위치와 이전 위치의 차이 계산
 			Point delta = eventManager.getDelta();

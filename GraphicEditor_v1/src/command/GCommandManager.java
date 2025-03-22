@@ -11,9 +11,7 @@ public class GCommandManager {
 	public GCommandManager() {
 		commands.put(GMode.DEFAULT, new DefaultCommand());
 		commands.put(GMode.SHAPE, new GShapeCommand());
-		commands.put(GMode.SELECTION, new GGroupSelectionCommand());
 		commands.put(GMode.GROUP_MOVE, new GGroupMoveCommand());
-
 	}
 
 	public void execute(GMode mode) {

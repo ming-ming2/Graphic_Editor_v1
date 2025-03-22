@@ -17,48 +17,29 @@ public class DefaultHandler implements GMouseEventHandler {
 	private boolean isMovingShape = false;
 	private GShape clickedShape = null;
 
-	// 인자 없는 생성자
-	public DefaultHandler() {
-		this.commandManager = null;
-		// 지연 초기화를 위해 여기서는 drawingStateManager를 설정하지 않음
-	}
-
-	// 명령 관리자를 받는 생성자
 	public DefaultHandler(GCommandManager commandManager) {
 		this.commandManager = commandManager;
+		this.drawingStateManager = GDrawingStateManager.getInstance();
 
-		GEventStateMananger.getInstance();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		startPoint = e.getPoint();
+		GEventStateMananger eventManager = GEventStateMananger.getInstance();
+		eventManager.setSelectionStartPoint(startPoint);
+		eventManager.setShiftDown(e.isShiftDown());
+		eventManager.setMouseReleased(false);
 
 		// 클릭 위치에 도형이 있는지 확인
 		clickedShape = drawingStateManager.findShapeAt(startPoint);
 
 		if (clickedShape != null) {
-			// 도형을 클릭한 경우
-			if (!e.isShiftDown()) {
-				// Shift 키가 눌리지 않았다면 기존 선택 해제
-				if (!clickedShape.isSelected()) {
-					drawingStateManager.clearSelection();
-				}
-			}
-
-			// 클릭한 도형 선택 상태 토글
-			if (clickedShape.isSelected()) {
-				if (e.isShiftDown()) {
-					// Shift 키가 눌렸으면 선택 해제
-					drawingStateManager.removeFromSelection(clickedShape);
-				}
-			} else {
-				// 도형 선택
-				drawingStateManager.addToSelection(clickedShape);
-			}
-
+			// 도형 클릭 처리
+			handleShapeClick(clickedShape, e.isShiftDown());
 			isMovingShape = true;
-			// 그룹 이동을 위한 시작점 설정
+
+			// 그룹 이동 시작
 			drawingStateManager.setDragStartPoint(startPoint);
 			drawingStateManager.setDraggingSelection(true);
 		} else {
@@ -68,7 +49,7 @@ public class DefaultHandler implements GMouseEventHandler {
 				drawingStateManager.clearSelection();
 			}
 
-			// 선택 영역 표시 시작
+			// 선택 영역 표시 시작 (크기 0으로 초기화)
 			drawingStateManager.setSelectionArea(new Rectangle(startPoint.x, startPoint.y, 0, 0));
 			isMovingShape = false;
 		}
@@ -76,24 +57,16 @@ public class DefaultHandler implements GMouseEventHandler {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		GEventStateMananger eventManager = GEventStateMananger.getInstance();
+		eventManager.setSelectionEndPoint(e.getPoint());
+		eventManager.setMouseReleased(true);
+
 		if (isMovingShape) {
 			// 도형 이동 종료
 			drawingStateManager.setDraggingSelection(false);
 		} else if (startPoint != null) {
-			// 선택 영역이 생성된 경우
-			Rectangle selectionArea = createSelectionRectangle(e.getPoint());
-
-			// 미니멈 크기 체크 (너무 작은 영역은 무시)
-			if (selectionArea.width > 5 && selectionArea.height > 5) {
-				// 선택 영역 내 도형 선택 (명령 실행)
-				drawingStateManager.setSelectionArea(selectionArea);
-				if (commandManager != null) {
-					commandManager.execute(GMode.SELECTION);
-				}
-			}
-
-			// 선택 영역 표시 제거
-			drawingStateManager.setSelectionArea(null);
+			// 선택 영역 선택 명령 실행
+			commandManager.execute(GMode.DEFAULT);
 		}
 
 		isMovingShape = false;
@@ -106,26 +79,38 @@ public class DefaultHandler implements GMouseEventHandler {
 		if (startPoint == null)
 			return;
 
+		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		Point currentPoint = e.getPoint();
+		eventManager.setCurrentPoint(currentPoint);
+		eventManager.setSelectionEndPoint(currentPoint);
+		eventManager.setMouseReleased(false);
 
 		if (isMovingShape && !drawingStateManager.getSelectedShapes().isEmpty()) {
-			// 선택된 도형 이동 (명령 실행)
-			if (commandManager != null) {
-				commandManager.execute(GMode.GROUP_MOVE);
-			}
+			// 선택된 도형 이동 명령 실행
+			commandManager.execute(GMode.GROUP_MOVE);
 		} else {
-			// 선택 영역 업데이트
-			Rectangle selectionArea = createSelectionRectangle(currentPoint);
-			drawingStateManager.setSelectionArea(selectionArea);
+			// 선택 영역 프리뷰 업데이트
+			commandManager.execute(GMode.DEFAULT);
 		}
 	}
 
-	private Rectangle createSelectionRectangle(Point currentPoint) {
-		int x = Math.min(startPoint.x, currentPoint.x);
-		int y = Math.min(startPoint.y, currentPoint.y);
-		int width = Math.abs(currentPoint.x - startPoint.x);
-		int height = Math.abs(currentPoint.y - startPoint.y);
+	private void handleShapeClick(GShape shape, boolean isShiftDown) {
+		// Shift 키가 눌리지 않았고, 클릭한 도형이 아직 선택되지 않았다면
+		if (!isShiftDown && !shape.isSelected()) {
+			// 기존 선택 모두 해제
+			drawingStateManager.clearSelection();
+		}
 
-		return new Rectangle(x, y, width, height);
+		// 클릭한 도형의 선택 상태 토글
+		if (shape.isSelected()) {
+			if (isShiftDown) {
+				// Shift 키가 눌렸을 때만 선택 해제 (다중 선택 모드)
+				drawingStateManager.removeFromSelection(shape);
+			}
+			// Shift가 안 눌렸으면 이미 선택된 도형은 선택 유지
+		} else {
+			// 도형 선택 추가
+			drawingStateManager.addToSelection(shape);
+		}
 	}
 }

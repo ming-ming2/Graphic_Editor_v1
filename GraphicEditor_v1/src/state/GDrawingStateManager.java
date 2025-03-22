@@ -5,9 +5,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import command.GCommandManager;
-import eventhandler.GMouseEventHandler;
-import eventhandler.GMouseEventHandlerRegistry;
 import shapes.GShape;
 import type.GMode;
 import type.GShapeType;
@@ -17,11 +14,9 @@ public class GDrawingStateManager extends GStateManager {
 	private static GDrawingStateManager drawingStateManager;
 
 	// commandManager 생성
-	private GCommandManager commandManager;
-	private GMouseEventHandlerRegistry mouserEventHandlerRegistry;
 
 	// DrawingPanel에 적용되는 state
-	private GMouseEventHandler currentMouseEventHandler;
+
 	private GMode currentMode;
 	private GShapeType currentShapeType;
 	private GShape previewShape;
@@ -33,9 +28,7 @@ public class GDrawingStateManager extends GStateManager {
 	private boolean isDraggingSelection = false;
 
 	private GDrawingStateManager() {
-		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다
-		this.commandManager = new GCommandManager();
-		this.mouserEventHandlerRegistry = new GMouseEventHandlerRegistry(commandManager);
+		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다this.commandManager = new GCommandManager();
 		this.setCurrentMode(GMode.DEFAULT);
 		this.setCurrentShapeType(null);
 		this.setPreviewShape(null);
@@ -46,14 +39,6 @@ public class GDrawingStateManager extends GStateManager {
 			drawingStateManager = new GDrawingStateManager();
 		}
 		return drawingStateManager;
-	}
-
-	public GMouseEventHandler getCurrentMouseEventHandler() {
-		return currentMouseEventHandler;
-	}
-
-	public void setCurrentMouseEventHandler(GMouseEventHandler mouseEventHandler) {
-		this.currentMouseEventHandler = mouseEventHandler;
 	}
 
 	public GMode getCurrentMode() {
@@ -70,7 +55,7 @@ public class GDrawingStateManager extends GStateManager {
 
 	public void setCurrentMode(GMode mode) {
 		this.currentMode = mode;
-		setCurrentMouseEventHandler(mouserEventHandlerRegistry.get(mode));
+		GEventStateMananger.getInstance().setCurrentMouseEventHandler(mode);
 	}
 
 	public GShapeType getCurrentShapeType() {

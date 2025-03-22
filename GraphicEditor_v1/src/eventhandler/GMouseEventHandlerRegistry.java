@@ -12,9 +12,7 @@ public class GMouseEventHandlerRegistry {
 	public GMouseEventHandlerRegistry(GCommandManager commandManager) {
 		handlers.put(GMode.DEFAULT, new DefaultHandler(commandManager));
 		handlers.put(GMode.SHAPE, new GShapeDrawingHandler(commandManager));
-		handlers.put(GMode.SELECTION, new GSelectionHandler(commandManager));
 		handlers.put(GMode.GROUP_MOVE, new GGroupMoveHandler(commandManager));
-
 	}
 
 	public GMouseEventHandler get(GMode mode) {
