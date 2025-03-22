@@ -2,6 +2,7 @@ package state;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,21 +11,21 @@ import type.GMode;
 import type.GShapeType;
 
 public class GDrawingStateManager extends GStateManager {
-	// 단일 객체
 	private static GDrawingStateManager drawingStateManager;
 
 	private GMode currentMode;
 	private GShapeType currentShapeType;
 	private GShape previewShape;
 	private List<GShape> shapes = new ArrayList<>();
-	// 그룹 선택 관련 필드 추가
 	private Rectangle selectionArea;
 	private List<GShape> selectedShapes = new ArrayList<>();
 	private Point dragStartPoint;
 	private boolean isDraggingSelection = false;
 
+	// 현재 열려있는 파일 경로 추가
+	private File currentFile = null;
+
 	private GDrawingStateManager() {
-		// 외부 생성 금지. 모든 컴포넌트가 동일한 상태를 공유한다
 		this.currentMode = GMode.DEFAULT;
 		this.currentMode = null;
 		this.previewShape = null;
@@ -37,12 +38,25 @@ public class GDrawingStateManager extends GStateManager {
 		return drawingStateManager;
 	}
 
+	public File getCurrentFile() {
+		return currentFile;
+	}
+
+	public void setCurrentFile(File file) {
+		this.currentFile = file;
+	}
+
 	public GMode getCurrentMode() {
 		return currentMode;
 	}
 
 	public List<GShape> getShapes() {
 		return shapes;
+	}
+
+	public void setShapes(List<GShape> shapes) {
+		this.shapes = new ArrayList<>(shapes);
+		notifyObservers();
 	}
 
 	public GShape getPreviewShape() {

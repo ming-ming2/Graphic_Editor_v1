@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
@@ -24,6 +25,7 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 	private GDrawingStateManager drawingStateManager;
 	private GEventStateMananger eventStateManager;
 	private boolean isDragging = false;
+	private BufferedImage backgroundImage = null;
 
 	public GDrawingPanel() {
 		this.drawingStateManager = GDrawingStateManager.getInstance();
@@ -32,14 +34,21 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 		eventStateManager.addObserver(this);
 	}
 
+	public void setBackgroundImage(BufferedImage image) {
+		this.backgroundImage = image;
+		repaint();
+	}
+
+	public BufferedImage getBackgroundImage() {
+		return backgroundImage;
+	}
+
 	@Override
 	public void createComponents() {
-		//
 	}
 
 	@Override
 	public void arrangeComponents() {
-		//
 	}
 
 	@Override
@@ -91,6 +100,10 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+
+		if (backgroundImage != null) {
+			g2d.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), null);
+		}
 
 		for (GShape shape : drawingStateManager.getShapes()) {
 			shape.draw(g);

@@ -7,8 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.io.Serializable;
 
-public abstract class GShape {
+public abstract class GShape implements Serializable {
+	private static final long serialVersionUID = 1L;
 	protected Point point;
 	protected boolean isSelected = false;
 	private static final int CONTROL_POINT_SIZE = 6;

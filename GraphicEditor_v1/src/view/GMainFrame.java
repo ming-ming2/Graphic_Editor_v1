@@ -25,7 +25,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	public void createComponents() {
 		this.drawingPanel = new GDrawingPanel();
 		this.toolBar = new GToolBar();
-		this.menuBar = new GMenuBar();
+		this.menuBar = new GMenuBar(drawingPanel);
 		this.components.add(drawingPanel);
 		this.components.add(toolBar);
 		this.components.add(menuBar);
@@ -48,13 +48,11 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		this.setSize((int) (dim.width / 2.), dim.height * 2 / 3);
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 	}
 
 	@Override
 	public void addEventHandler() {
 		//
-
 	}
 
 	@Override
@@ -67,5 +65,4 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 			component.initialize();
 		}
 	}
-
 }
