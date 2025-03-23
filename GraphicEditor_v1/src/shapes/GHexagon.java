@@ -17,12 +17,11 @@ public class GHexagon extends GPolygonShape {
 
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
-
 		int radiusX = width / 2;
 		int radiusY = height / 2;
 
 		for (int i = 0; i < 6; i++) {
-			double angle = 2 * Math.PI * i / 6;
+			double angle = 2 * Math.PI * i / 6 - Math.PI / 2;
 			xPoints[i] = (int) (centerX + radiusX * Math.cos(angle));
 			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}

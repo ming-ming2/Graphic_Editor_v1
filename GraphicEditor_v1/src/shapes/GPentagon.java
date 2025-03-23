@@ -17,7 +17,6 @@ public class GPentagon extends GPolygonShape {
 
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
-
 		int radiusX = width / 2;
 		int radiusY = height / 2;
 
