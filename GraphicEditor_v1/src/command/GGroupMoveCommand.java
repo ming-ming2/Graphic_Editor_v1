@@ -9,63 +9,96 @@ import state.GDrawingStateManager;
 import state.GEventStateMananger;
 
 public class GGroupMoveCommand implements GCommand {
-	private Map<GShape, Point> originalPositions = new HashMap<>();
-	private Map<GShape, Point> newPositions = new HashMap<>();
+	// 원본 위치 저장
+	private final Map<GShape, Point> originalPositions = new HashMap<>();
+
+	// 최종 위치 (초기에는 비어있고 마우스 릴리즈 시 저장)
+	private final Map<GShape, Point> finalPositions = new HashMap<>();
+
+	// 이동 완료 여부
+	private boolean moveFinished = false;
+
+	/**
+	 * 원본 위치를 받는 생성자
+	 */
+	public GGroupMoveCommand(Map<GShape, Point> originalPositions) {
+		if (originalPositions != null) {
+			this.originalPositions.putAll(originalPositions);
+		}
+	}
 
 	@Override
 	public void execute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
-		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
-		// 첫 실행 시 원래 위치 저장
-		if (originalPositions.isEmpty()) {
-			for (GShape shape : drawingManager.getSelectedShapes()) {
-				originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
+		if (moveFinished) {
+			// 이동이 완료된 상태 (다시 실행 시)
+			for (GShape shape : finalPositions.keySet()) {
+				if (drawingManager.getShapes().contains(shape)) {
+					moveShapeTo(shape, finalPositions.get(shape));
+				}
 			}
-		}
+			drawingManager.notifyObservers();
+		} else {
+			// 드래그 중 이동 처리
+			GEventStateMananger eventManager = GEventStateMananger.getInstance();
+			if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
+				Point currentPoint = eventManager.getCurrentPoint();
+				if (currentPoint != null) {
+					drawingManager.moveSelectedShapesToPosition(currentPoint);
+				}
 
-		Point currentPoint = eventManager.getCurrentPoint();
-		if (currentPoint != null && drawingManager.isDraggingSelection()
-				&& !drawingManager.getSelectedShapes().isEmpty()) {
-			drawingManager.moveSelectedShapesToPosition(currentPoint);
-
-			// 실행 후 새 위치 저장
-			newPositions.clear();
-			for (GShape shape : drawingManager.getSelectedShapes()) {
-				newPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
+				// 마우스 릴리즈 시 최종 위치 저장
+				if (eventManager.isMouseReleased() && finalPositions.isEmpty()) {
+					for (GShape shape : drawingManager.getSelectedShapes()) {
+						if (originalPositions.containsKey(shape)) {
+							finalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
+						}
+					}
+					moveFinished = true;
+				}
 			}
 		}
 	}
 
 	@Override
 	public void unexecute() {
+		// 원본 위치로 복원
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
-
 		for (GShape shape : originalPositions.keySet()) {
-			Point originalPos = originalPositions.get(shape);
-			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
-
-			int dx = originalPos.x - currentPos.x;
-			int dy = originalPos.y - currentPos.y;
-			shape.move(dx, dy);
+			if (drawingManager.getShapes().contains(shape)) {
+				moveShapeTo(shape, originalPositions.get(shape));
+			}
 		}
-
 		drawingManager.notifyObservers();
 	}
 
-	// redo를 위한 추가 메서드 (필요 시 사용)
-	private void restoreNewPositions() {
-		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
-
-		for (GShape shape : newPositions.keySet()) {
-			Point newPos = newPositions.get(shape);
-			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
-
-			int dx = newPos.x - currentPos.x;
-			int dy = newPos.y - currentPos.y;
-			shape.move(dx, dy);
+	/**
+	 * 위치가 실제로 변경되었는지 체크
+	 */
+	public boolean hasChanged() {
+		if (!moveFinished || finalPositions.isEmpty()) {
+			return false;
 		}
 
-		drawingManager.notifyObservers();
+		// 원본 위치와 최종 위치를 비교
+		for (GShape shape : originalPositions.keySet()) {
+			Point original = originalPositions.get(shape);
+			Point finalPos = finalPositions.get(shape);
+
+			if (finalPos != null && (original.x != finalPos.x || original.y != finalPos.y)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// 도형을 특정 위치로 이동
+	private void moveShapeTo(GShape shape, Point targetPosition) {
+		Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
+		int dx = targetPosition.x - currentPos.x;
+		int dy = targetPosition.y - currentPos.y;
+		shape.move(dx, dy);
 	}
 }

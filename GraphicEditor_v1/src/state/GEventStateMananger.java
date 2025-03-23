@@ -56,8 +56,12 @@ public class GEventStateMananger extends GStateManager {
 	}
 
 	public void setCurrentMouseEventHandler(GMode mode) {
-		System.out.println("모드 변경 : " + this.currentMouseEventHandler + " -> " + mode);
-		this.currentMouseEventHandler = mouserEventHandlerRegistry.get(mode);
+		GMouseEventHandler handler = mouserEventHandlerRegistry.get(mode);
+		if (handler != null) {
+			this.currentMouseEventHandler = handler;
+		} else {
+			System.err.println("알 수 없는 모드: " + mode);
+		}
 	}
 
 	public List<MouseEvent> getMouseEvents() {
@@ -65,6 +69,9 @@ public class GEventStateMananger extends GStateManager {
 	}
 
 	public void setCurrentPoint(Point point) {
+		if (point == null) {
+			return;
+		}
 		if (this.currentPoint != null) {
 			this.previousPoint = new Point(this.currentPoint);
 		} else {
@@ -90,7 +97,11 @@ public class GEventStateMananger extends GStateManager {
 	}
 
 	public void setSelectionStartPoint(Point point) {
-		this.selectionStartPoint = point;
+		if (point != null) {
+			this.selectionStartPoint = new Point(point);
+		} else {
+			this.selectionStartPoint = null;
+		}
 	}
 
 	public Point getSelectionStartPoint() {
@@ -98,7 +109,11 @@ public class GEventStateMananger extends GStateManager {
 	}
 
 	public void setSelectionEndPoint(Point point) {
-		this.selectionEndPoint = point;
+		if (point != null) {
+			this.selectionEndPoint = new Point(point);
+		} else {
+			this.selectionEndPoint = null;
+		}
 		notifyObservers();
 	}
 
