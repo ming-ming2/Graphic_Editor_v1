@@ -10,26 +10,29 @@ import state.GEventStateMananger;
 
 public class GGroupMoveCommand implements GCommand {
 	private Map<GShape, Point> originalPositions = new HashMap<>();
-	private boolean executed = false;
+	private Map<GShape, Point> newPositions = new HashMap<>();
 
 	@Override
 	public void execute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
-		if (drawingManager.isDraggingSelection() && !drawingManager.getSelectedShapes().isEmpty()) {
-			// 최초 실행 시에만 원래 위치 저장
-			if (!executed) {
-				// 선택된 도형들의 원래 위치 저장
-				for (GShape shape : drawingManager.getSelectedShapes()) {
-					originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
-				}
-				executed = true;
+		// 첫 실행 시 원래 위치 저장
+		if (originalPositions.isEmpty()) {
+			for (GShape shape : drawingManager.getSelectedShapes()) {
+				originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
 			}
+		}
 
-			Point currentPoint = eventManager.getCurrentPoint();
-			if (currentPoint != null) {
-				drawingManager.moveSelectedShapesToPosition(currentPoint);
+		Point currentPoint = eventManager.getCurrentPoint();
+		if (currentPoint != null && drawingManager.isDraggingSelection()
+				&& !drawingManager.getSelectedShapes().isEmpty()) {
+			drawingManager.moveSelectedShapesToPosition(currentPoint);
+
+			// 실행 후 새 위치 저장
+			newPositions.clear();
+			for (GShape shape : drawingManager.getSelectedShapes()) {
+				newPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
 			}
 		}
 	}
@@ -38,17 +41,28 @@ public class GGroupMoveCommand implements GCommand {
 	public void unexecute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 
-		// 각 도형을 원래 위치로 복원
-		for (Map.Entry<GShape, Point> entry : originalPositions.entrySet()) {
-			GShape shape = entry.getKey();
-			Point originalPos = entry.getValue();
-
-			// 현재 위치 구하기
+		for (GShape shape : originalPositions.keySet()) {
+			Point originalPos = originalPositions.get(shape);
 			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
 
-			// 원래 위치로 이동
 			int dx = originalPos.x - currentPos.x;
 			int dy = originalPos.y - currentPos.y;
+			shape.move(dx, dy);
+		}
+
+		drawingManager.notifyObservers();
+	}
+
+	// redo를 위한 추가 메서드 (필요 시 사용)
+	private void restoreNewPositions() {
+		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
+
+		for (GShape shape : newPositions.keySet()) {
+			Point newPos = newPositions.get(shape);
+			Point currentPos = new Point(shape.getBounds().x, shape.getBounds().y);
+
+			int dx = newPos.x - currentPos.x;
+			int dy = newPos.y - currentPos.y;
 			shape.move(dx, dy);
 		}
 

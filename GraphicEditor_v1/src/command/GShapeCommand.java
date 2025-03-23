@@ -1,6 +1,7 @@
 package command;
 
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import shapes.GShape;
@@ -11,27 +12,28 @@ import type.GShapeType;
 
 public class GShapeCommand implements GCommand {
 	private GShape createdShape;
-	private boolean executed = false;
 
 	@Override
 	public void execute() {
-		if (executed && createdShape != null) {
+		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 
-			GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
+		// 이미 실행된 명령인 경우 (redo를 위한 실행)
+		if (createdShape != null) {
 			drawingManager.addShape(createdShape);
 			return;
 		}
 
+		// 처음 실행되는 경우
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		List<MouseEvent> events = eventManager.getMouseEvents();
-
-		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GShapeType shapeType = drawingManager.getCurrentShapeType();
 
 		if (events == null || events.size() < 2 || shapeType == null) {
 			return;
 		}
 
+		new ArrayList<>(events);
+		// 도형 생성
 		GShape shape = GShapeFactory.getShape(shapeType, events);
 
 		if (shape != null) {
@@ -39,8 +41,7 @@ public class GShapeCommand implements GCommand {
 			if (lastEvent.getID() == MouseEvent.MOUSE_RELEASED) {
 				drawingManager.addShape(shape);
 				drawingManager.setPreviewShape(null);
-				createdShape = shape;
-				executed = true;
+				this.createdShape = shape;
 			} else {
 				drawingManager.setPreviewShape(shape);
 			}

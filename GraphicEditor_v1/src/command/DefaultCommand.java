@@ -12,15 +12,26 @@ import state.GEventStateMananger;
 public class DefaultCommand implements GCommand {
 	private List<GShape> previouslySelectedShapes = new ArrayList<>();
 	private List<GShape> newlySelectedShapes = new ArrayList<>();
-	private boolean executed = false;
+
+	// 선택 영역 정보 저장
+	private Point startPoint;
+	private Point endPoint;
+	private boolean shiftDown;
 
 	@Override
 	public void execute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
-		Point startPoint = eventManager.getSelectionStartPoint();
-		Point endPoint = eventManager.getSelectionEndPoint();
+		// 첫 실행 시 이전 선택 상태와 선택 정보 저장
+		if (startPoint == null) {
+			startPoint = eventManager.getSelectionStartPoint();
+			endPoint = eventManager.getSelectionEndPoint();
+			shiftDown = eventManager.isShiftDown();
+
+			previouslySelectedShapes.clear();
+			previouslySelectedShapes.addAll(drawingManager.getSelectedShapes());
+		}
 
 		if (startPoint == null || endPoint == null) {
 			return;
@@ -29,25 +40,16 @@ public class DefaultCommand implements GCommand {
 		Rectangle selectionArea = createSelectionRectangle(startPoint, endPoint);
 		drawingManager.setSelectionArea(selectionArea);
 
-		if (eventManager.isMouseReleased()) {
-			if (selectionArea.width > 5 && selectionArea.height > 5) {
-				// 최초 실행 시에만 이전 선택 상태 저장
-				if (!executed) {
-					previouslySelectedShapes.clear();
-					previouslySelectedShapes.addAll(drawingManager.getSelectedShapes());
-					executed = true;
-				}
+		if (eventManager.isMouseReleased() && selectionArea.width > 5 && selectionArea.height > 5) {
+			if (!shiftDown) {
+				drawingManager.clearSelection();
+			}
 
-				if (!eventManager.isShiftDown()) {
-					drawingManager.clearSelection();
-				}
-
-				newlySelectedShapes.clear();
-				for (GShape shape : drawingManager.getShapes()) {
-					if (shape.isInside(selectionArea) && !drawingManager.getSelectedShapes().contains(shape)) {
-						drawingManager.addToSelection(shape);
-						newlySelectedShapes.add(shape);
-					}
+			newlySelectedShapes.clear();
+			for (GShape shape : drawingManager.getShapes()) {
+				if (shape.isInside(selectionArea) && !drawingManager.getSelectedShapes().contains(shape)) {
+					drawingManager.addToSelection(shape);
+					newlySelectedShapes.add(shape);
 				}
 			}
 
@@ -59,16 +61,15 @@ public class DefaultCommand implements GCommand {
 	public void unexecute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 
-		// 새로 선택된 도형들의 선택 해제
+		// 새로 선택된 도형들 선택 해제
 		for (GShape shape : newlySelectedShapes) {
 			drawingManager.removeFromSelection(shape);
 		}
 
-		// 이전에 선택되었던 도형들 중 현재 선택되지 않은 것들 다시 선택
+		// 이전에 선택되었던 도형들 복원
+		drawingManager.clearSelection();
 		for (GShape shape : previouslySelectedShapes) {
-			if (!drawingManager.getSelectedShapes().contains(shape)) {
-				drawingManager.addToSelection(shape);
-			}
+			drawingManager.addToSelection(shape);
 		}
 	}
 
