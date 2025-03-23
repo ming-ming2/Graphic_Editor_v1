@@ -62,6 +62,7 @@ public class GCommandManager extends GStateManager {
 		commandFactories.put(GMode.COPY, () -> new GCopyCommand());
 		commandFactories.put(GMode.PASTE, () -> new GPasteCommand());
 
+		// 줌 명령 팩토리 설정
 		zoomCommandFactories.put(GZoomType.ZOOM_IN, () -> new GZoomCommand(GZoomType.ZOOM_IN));
 		zoomCommandFactories.put(GZoomType.ZOOM_OUT, () -> new GZoomCommand(GZoomType.ZOOM_OUT));
 		zoomCommandFactories.put(GZoomType.ZOOM_RESET, () -> new GZoomCommand(GZoomType.ZOOM_RESET));
@@ -76,8 +77,24 @@ public class GCommandManager extends GStateManager {
 		return null;
 	}
 
+	public GCommand createZoomCommand(GZoomType zoomType) {
+		CommandFactory factory = zoomCommandFactories.get(zoomType);
+		if (factory != null) {
+			return factory.createCommand();
+		}
+		System.err.println("알 수 없는 줌 타입: " + zoomType);
+		return null;
+	}
+
 	public void execute(GMode mode) {
 		GCommand command = createCommand(mode);
+		if (command != null) {
+			command.execute();
+		}
+	}
+
+	public void execute(GZoomType zoomType) {
+		GCommand command = createZoomCommand(zoomType);
 		if (command != null) {
 			command.execute();
 		}
@@ -117,6 +134,17 @@ public class GCommandManager extends GStateManager {
 				// 스택에 저장된 명령은 더 이상 활성 명령이 아님
 				activeCommands.remove(mode);
 			}
+		}
+	}
+
+	public void executeAndStore(GZoomType zoomType) {
+		GCommand command = createZoomCommand(zoomType);
+		if (command != null) {
+			command.execute();
+			undoStack.push(command);
+			redoStack.clear();
+			notifyObservers();
+			System.out.println("줌 명령 스택에 추가: " + zoomType);
 		}
 	}
 

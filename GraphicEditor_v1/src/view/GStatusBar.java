@@ -50,10 +50,13 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 
 		// 줌 컨트롤 영역 (오른쪽)
 		JPanel zoomPanel = new JPanel();
+		zoomPanel.setOpaque(false);
 		zoomPanel.add(zoomOutButton);
-		zoomPanel.add(zoomLabel);
-		zoomPanel.add(zoomInButton);
 		zoomPanel.add(Box.createHorizontalStrut(5));
+		zoomPanel.add(zoomLabel);
+		zoomPanel.add(Box.createHorizontalStrut(5));
+		zoomPanel.add(zoomInButton);
+		zoomPanel.add(Box.createHorizontalStrut(10));
 		zoomPanel.add(zoomResetButton);
 
 		this.add(zoomPanel, BorderLayout.EAST);
@@ -62,7 +65,7 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 	@Override
 	public void setAttributes() {
 		this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-		this.setPreferredSize(new Dimension(0, 25));
+		this.setPreferredSize(new Dimension(0, 28));
 		this.setBackground(new Color(240, 240, 240));
 
 		// 상태 레이블 설정
@@ -72,19 +75,23 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 		// 줌 레이블 설정
 		zoomLabel.setPreferredSize(new Dimension(60, 20));
 		zoomLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		zoomLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// 줌 버튼 설정
-		zoomInButton.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
-		zoomOutButton.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
-		zoomResetButton.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		configureButton(zoomInButton, 40, 24);
+		configureButton(zoomOutButton, 40, 24);
+		configureButton(zoomResetButton, 60, 24);
+	}
 
-		zoomInButton.setFocusPainted(false);
-		zoomOutButton.setFocusPainted(false);
-		zoomResetButton.setFocusPainted(false);
-
-		zoomInButton.setPreferredSize(new Dimension(30, 20));
-		zoomOutButton.setPreferredSize(new Dimension(30, 20));
-		zoomResetButton.setPreferredSize(new Dimension(50, 20));
+	private void configureButton(JButton button, int width, int height) {
+		button.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		button.setFocusPainted(false);
+		button.setPreferredSize(new Dimension(width, height));
+		button.setMargin(new java.awt.Insets(2, 4, 2, 4));
+		// 버튼 배경 색상을 조금 더 밝게
+		button.setBackground(new Color(250, 250, 250));
+		button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)),
+				BorderFactory.createEmptyBorder(2, 4, 2, 4)));
 	}
 
 	@Override
