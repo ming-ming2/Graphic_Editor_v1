@@ -6,9 +6,11 @@ import java.util.Stack;
 
 import state.GStateManager;
 import type.GMode;
+import type.GZoomType;
 
 public class GCommandManager extends GStateManager {
 	private final Map<GMode, CommandFactory> commandFactories = new HashMap<>();
+	private final Map<GZoomType, CommandFactory> zoomCommandFactories = new HashMap<>();
 	private Stack<GCommand> undoStack = new Stack<>();
 	private Stack<GCommand> redoStack = new Stack<>();
 
@@ -59,6 +61,10 @@ public class GCommandManager extends GStateManager {
 		commandFactories.put(GMode.CUT, () -> new GCutCommand());
 		commandFactories.put(GMode.COPY, () -> new GCopyCommand());
 		commandFactories.put(GMode.PASTE, () -> new GPasteCommand());
+
+		zoomCommandFactories.put(GZoomType.ZOOM_IN, () -> new GZoomCommand(GZoomType.ZOOM_IN));
+		zoomCommandFactories.put(GZoomType.ZOOM_OUT, () -> new GZoomCommand(GZoomType.ZOOM_OUT));
+		zoomCommandFactories.put(GZoomType.ZOOM_RESET, () -> new GZoomCommand(GZoomType.ZOOM_RESET));
 	}
 
 	public GCommand createCommand(GMode mode) {

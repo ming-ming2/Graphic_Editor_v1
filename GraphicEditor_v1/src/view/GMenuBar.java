@@ -23,7 +23,9 @@ import state.GClipboard;
 import state.GDrawingStateManager;
 import state.GEventStateMananger;
 import state.GObserver;
+import state.GZoomManager;
 import type.GMode;
+import type.GZoomType;
 
 public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver {
 	private static final long serialVersionUID = 1L;
@@ -48,17 +50,22 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 	private JMenuItem zoomInMenuItem;
 	private JMenuItem zoomOutMenuItem;
+	private JMenuItem zoomResetMenuItem;
 
 	private GDrawingPanel drawingPanel;
 	private GCommandManager commandManager;
 	private GClipboard clipboard;
+	private GZoomManager zoomManager;
 
 	public GMenuBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		this.commandManager = GEventStateMananger.getInstance().getCommandManager();
 		this.clipboard = GClipboard.getInstance();
+		this.zoomManager = GZoomManager.getInstance();
+
 		this.commandManager.addObserver(this);
 		this.clipboard.addObserver(this);
+		this.zoomManager.addObserver(this);
 	}
 
 	@Override
@@ -83,6 +90,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 		zoomInMenuItem = new JMenuItem("확대");
 		zoomOutMenuItem = new JMenuItem("축소");
+		zoomResetMenuItem = new JMenuItem("기본 크기(100%)");
 	}
 
 	@Override
@@ -106,6 +114,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 		viewMenu.add(zoomInMenuItem);
 		viewMenu.add(zoomOutMenuItem);
+		viewMenu.add(zoomResetMenuItem);
 
 		this.add(fileMenu);
 		this.add(editMenu);
@@ -136,8 +145,9 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 		undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
 
-		zoomInMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, ActionEvent.CTRL_MASK));
+		zoomInMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, ActionEvent.CTRL_MASK));
 		zoomOutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, ActionEvent.CTRL_MASK));
+		zoomResetMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, ActionEvent.CTRL_MASK));
 
 		setMenuItemFont(newMenuItem, menuFont);
 		setMenuItemFont(openMenuItem, menuFont);
@@ -155,6 +165,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 		setMenuItemFont(zoomInMenuItem, menuFont);
 		setMenuItemFont(zoomOutMenuItem, menuFont);
+		setMenuItemFont(zoomResetMenuItem, menuFont);
 
 		updateUndoRedoState();
 		updateClipboardState();
@@ -307,7 +318,19 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 			commandManager.executeAndStore(GMode.PASTE);
 		});
 
-		zoomInMenuItem.addActionListener(dummyAction);
-		zoomOutMenuItem.addActionListener(dummyAction);
+		zoomInMenuItem.addActionListener(e -> {
+			System.out.println("확대 메뉴 클릭됨");
+			commandManager.executeAndStore(GZoomType.ZOOM_IN);
+		});
+
+		zoomOutMenuItem.addActionListener(e -> {
+			System.out.println("축소 메뉴 클릭됨");
+			commandManager.executeAndStore(GZoomType.ZOOM_OUT);
+		});
+
+		zoomResetMenuItem.addActionListener(e -> {
+			System.out.println("기본 크기 메뉴 클릭됨");
+			commandManager.executeAndStore(GZoomType.ZOOM_RESET);
+		});
 	}
 }

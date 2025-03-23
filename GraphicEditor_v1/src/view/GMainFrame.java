@@ -8,6 +8,9 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import state.GZoomManager;
 
 public class GMainFrame extends JFrame implements GContainerInterface {
 	private static final long serialVersionUID = 1L;
@@ -15,6 +18,8 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	private GDrawingPanel drawingPanel;
 	private GToolBar toolBar;
 	private GMenuBar menuBar;
+	private GStatusBar statusBar;
+	private JScrollPane scrollPane;
 	private List<GContainerInterface> components = new ArrayList<>();
 
 	public GMainFrame() {
@@ -26,9 +31,12 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		this.drawingPanel = new GDrawingPanel();
 		this.toolBar = new GToolBar();
 		this.menuBar = new GMenuBar(drawingPanel);
+		this.statusBar = new GStatusBar();
+		this.scrollPane = new JScrollPane(drawingPanel);
 		this.components.add(drawingPanel);
 		this.components.add(toolBar);
 		this.components.add(menuBar);
+		this.components.add(statusBar);
 	}
 
 	@Override
@@ -36,9 +44,15 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		this.setLayout(new BorderLayout());
 		this.setJMenuBar(menuBar);
 		this.add(toolBar, BorderLayout.NORTH);
+
 		JPanel centerPanel = new JPanel(new BorderLayout());
-		centerPanel.add(drawingPanel, BorderLayout.CENTER);
+		centerPanel.add(scrollPane, BorderLayout.CENTER);
 		this.add(centerPanel, BorderLayout.CENTER);
+
+		this.add(statusBar, BorderLayout.SOUTH);
+
+		// 줌 매니저에 상태표시줄 옵저버 등록
+		GZoomManager.getInstance().addObserver(statusBar);
 	}
 
 	@Override
@@ -48,6 +62,12 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		this.setSize((int) (dim.width / 2.), dim.height * 2 / 3);
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// 스크롤 패널 설정
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
 	}
 
 	@Override
