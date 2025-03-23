@@ -1,25 +1,17 @@
 package shapes;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 
-public class GHexagon extends GShape {
-
+public class GHexagon extends GPolygonShape {
 	private static final long serialVersionUID = 1L;
-	private int width;
-	private int height;
-	private Polygon hexagonPolygon;
 
 	public GHexagon(Point point, int width, int height) {
-		this.point = point;
-		this.width = width;
-		this.height = height;
-		updatePolygon();
+		super(point, width, height);
 	}
 
-	private void updatePolygon() {
+	@Override
+	protected void updatePolygon() {
 		int[] xPoints = new int[6];
 		int[] yPoints = new int[6];
 
@@ -35,38 +27,6 @@ public class GHexagon extends GShape {
 			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
-		hexagonPolygon = new Polygon(xPoints, yPoints, 6);
-	}
-
-	@Override
-	public void draw(Graphics g) {
-		updatePolygon();
-		g.drawPolygon(hexagonPolygon);
-
-		if (isSelected) {
-			drawSelectionBox(g);
-		}
-	}
-
-	@Override
-	public boolean isInside(Rectangle rect) {
-		return rect.contains(getBounds());
-	}
-
-	@Override
-	public void move(int dx, int dy) {
-		point.x += dx;
-		point.y += dy;
-		updatePolygon();
-	}
-
-	@Override
-	public Rectangle getBounds() {
-		return new Rectangle(point.x, point.y, width, height);
-	}
-
-	@Override
-	public boolean contains(Point p) {
-		return hexagonPolygon.contains(p);
+		polygon = new Polygon(xPoints, yPoints, 6);
 	}
 }

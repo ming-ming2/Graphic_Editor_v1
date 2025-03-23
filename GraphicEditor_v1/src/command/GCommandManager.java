@@ -1,12 +1,9 @@
 package command;
 
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import shapes.GShape;
-import state.GDrawingStateManager;
 import state.GStateManager;
 import type.GMode;
 
@@ -15,8 +12,8 @@ public class GCommandManager extends GStateManager {
 	private Stack<GCommand> undoStack = new Stack<>();
 	private Stack<GCommand> redoStack = new Stack<>();
 
-	// 현재 실행 중인 이동 명령 참조 (드래그 중)
-	private GGroupMoveCommand currentMoveCommand;
+	// 현재 활성화된 명령 참조
+	private Map<GMode, GCommand> activeCommands = new HashMap<>();
 
 	private interface CommandFactory {
 		GCommand createCommand();
@@ -27,19 +24,39 @@ public class GCommandManager extends GStateManager {
 		commandFactories.put(GMode.SHAPE, () -> new GShapeCommand());
 		commandFactories.put(GMode.GROUP_MOVE, () -> {
 			// 이미 생성된 이동 명령이 있다면 재사용
-			if (currentMoveCommand != null) {
-				return currentMoveCommand;
-			}
-			// 없으면 새로 생성 및 초기화
-			GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
-			Map<GShape, Point> originalPositions = new HashMap<>();
-
-			for (GShape shape : drawingManager.getSelectedShapes()) {
-				originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
+			GCommand existingCommand = activeCommands.get(GMode.GROUP_MOVE);
+			if (existingCommand != null) {
+				return existingCommand;
 			}
 
-			currentMoveCommand = new GGroupMoveCommand(originalPositions);
-			return currentMoveCommand;
+			// 없으면 새로 생성
+			GCommand newCommand = new GGroupMoveCommand();
+			activeCommands.put(GMode.GROUP_MOVE, newCommand);
+			return newCommand;
+		});
+		commandFactories.put(GMode.RESIZE, () -> {
+			// 이미 생성된 리사이즈 명령이 있다면 재사용
+			GCommand existingCommand = activeCommands.get(GMode.RESIZE);
+			if (existingCommand != null) {
+				return existingCommand;
+			}
+
+			// 없으면 새로 생성
+			GCommand newCommand = new GResizeCommand();
+			activeCommands.put(GMode.RESIZE, newCommand);
+			return newCommand;
+		});
+		commandFactories.put(GMode.ROTATE, () -> {
+			// 이미 생성된 회전 명령이 있다면 재사용
+			GCommand existingCommand = activeCommands.get(GMode.ROTATE);
+			if (existingCommand != null) {
+				return existingCommand;
+			}
+
+			// 없으면 새로 생성
+			GCommand newCommand = new GRotateCommand();
+			activeCommands.put(GMode.ROTATE, newCommand);
+			return newCommand;
 		});
 	}
 
@@ -60,28 +77,26 @@ public class GCommandManager extends GStateManager {
 	}
 
 	public void executeAndStore(GMode mode) {
-		if (mode == GMode.GROUP_MOVE) {
-			// 이동 명령 특별 처리
-			if (currentMoveCommand != null && currentMoveCommand.hasChanged()) {
-				// 현재 명령을 스택에 저장
-				undoStack.push(currentMoveCommand);
+		GCommand command = activeCommands.get(mode);
+
+		// 해당 모드의 명령이 없으면 새로 생성
+		if (command == null) {
+			command = createCommand(mode);
+		}
+
+		if (command != null) {
+			command.execute();
+
+			// 변경 사항이 있는 경우에만 스택에 저장
+			if ((mode == GMode.DEFAULT && ((DefaultCommand) command).hasChanges()) || mode != GMode.DEFAULT) {
+
+				undoStack.push(command);
 				redoStack.clear();
 				notifyObservers();
-				System.out.println("명령 스택에 추가: GGroupMoveCommand");
-			}
-			// 다음 이동을 위해 현재 이동 명령 참조 초기화
-			currentMoveCommand = null;
-		} else {
-			// 다른 모드는 기존 방식대로 처리
-			GCommand command = createCommand(mode);
-			if (command != null) {
-				command.execute();
-				if (mode != GMode.DEFAULT || (mode == GMode.DEFAULT && ((DefaultCommand) command).hasChanges())) {
-					undoStack.push(command);
-					redoStack.clear();
-					notifyObservers();
-					System.out.println("명령 스택에 추가: " + command.getClass().getSimpleName());
-				}
+				System.out.println("명령 스택에 추가: " + command.getClass().getSimpleName());
+
+				// 스택에 저장된 명령은 더 이상 활성 명령이 아님
+				activeCommands.remove(mode);
 			}
 		}
 	}
@@ -121,5 +136,10 @@ public class GCommandManager extends GStateManager {
 			notifyObservers();
 			System.out.println("다시 실행: " + command.getClass().getSimpleName());
 		}
+	}
+
+	// 현재 활성화된 명령들 초기화
+	public void resetActiveCommands() {
+		activeCommands.clear();
 	}
 }

@@ -3,32 +3,32 @@ package shapes;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 
-public class GRoundRectangle extends GShape {
-	private static final long serialVersionUID = 1L;
-	private int width;
-	private int height;
-	private final int arcSize = 20;
+public abstract class GPolygonShape extends GShape {
+	protected int width;
+	protected int height;
+	protected Polygon polygon;
 
-	public GRoundRectangle(Point point, int width, int height) {
+	public GPolygonShape(Point point, int width, int height) {
 		this.point = point;
 		this.width = width;
 		this.height = height;
+		updatePolygon();
 	}
+
+	protected abstract void updatePolygon();
 
 	@Override
 	public void draw(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		AffineTransform oldTransform = null;
+		Graphics2D g2d = (Graphics2D) g.create(); // 새 그래픽 컨텍스트 생성
 
+		// 회전 변환 적용
 		if (rotationAngle != 0) {
 			Rectangle bounds = getBounds();
 			int centerX = bounds.x + bounds.width / 2;
 			int centerY = bounds.y + bounds.height / 2;
-
-			oldTransform = g2d.getTransform();
 
 			// 회전 변환 적용
 			g2d.translate(centerX, centerY);
@@ -36,12 +36,11 @@ public class GRoundRectangle extends GShape {
 			g2d.translate(-centerX, -centerY);
 		}
 
-		g2d.drawRoundRect(point.x, point.y, width, height, arcSize, arcSize);
+		updatePolygon();
+		g2d.drawPolygon(polygon);
 
-		// 변환 복원
-		if (oldTransform != null) {
-			g2d.setTransform(oldTransform);
-		}
+		// 그래픽 컨텍스트 해제
+		g2d.dispose();
 
 		if (isSelected) {
 			drawSelectionBox(g);
@@ -57,6 +56,7 @@ public class GRoundRectangle extends GShape {
 	public void move(int dx, int dy) {
 		point.x += dx;
 		point.y += dy;
+		updatePolygon();
 	}
 
 	@Override
@@ -81,10 +81,11 @@ public class GRoundRectangle extends GShape {
 			int rotatedX = (int) (dx * cos - dy * sin) + centerX;
 			int rotatedY = (int) (dx * sin + dy * cos) + centerY;
 
-			return getBounds().contains(rotatedX, rotatedY);
+			Point rotatedPoint = new Point(rotatedX, rotatedY);
+			return polygon.contains(rotatedPoint);
 		}
 
-		return getBounds().contains(p);
+		return polygon.contains(p);
 	}
 
 	@Override
@@ -158,6 +159,9 @@ public class GRoundRectangle extends GShape {
 		default:
 			break;
 		}
+
+		// 다각형 업데이트
+		updatePolygon();
 	}
 
 	@Override
@@ -166,5 +170,6 @@ public class GRoundRectangle extends GShape {
 		this.point.y = bounds.y;
 		this.width = bounds.width;
 		this.height = bounds.height;
+		updatePolygon();
 	}
 }

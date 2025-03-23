@@ -3,8 +3,10 @@ package view;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -92,6 +94,49 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				eventStateManager.setCurrentPoint(e.getPoint());
+
+				// 제어점 위에 있는지 확인하고 커서 변경
+				Point point = e.getPoint();
+				for (GShape shape : drawingStateManager.getSelectedShapes()) {
+					GShape.ControlPoint cp = shape.getControlPointAt(point);
+					if (cp != GShape.ControlPoint.NONE) {
+						// 제어점에 따라 적절한 커서 설정
+						switch (cp) {
+						case TOP_LEFT:
+						case BOTTOM_RIGHT:
+							setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
+							break;
+						case TOP_RIGHT:
+						case BOTTOM_LEFT:
+							setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));
+							break;
+						case TOP:
+						case BOTTOM:
+							setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+							break;
+						case LEFT:
+						case RIGHT:
+							setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+							break;
+						case ROTATE:
+							// 회전 커서 (자바에는 완벽한 회전 커서가 없어 유사한 것 사용)
+							setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+							break;
+						default:
+							setCursor(Cursor.getDefaultCursor());
+						}
+						return;
+					}
+				}
+
+				// 도형 위에 있는지 확인
+				GShape shapeUnderMouse = drawingStateManager.findShapeAt(point);
+				if (shapeUnderMouse != null) {
+					setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				} else {
+					// 아무것도 없으면 기본 커서
+					setCursor(Cursor.getDefaultCursor());
+				}
 			}
 		});
 	}

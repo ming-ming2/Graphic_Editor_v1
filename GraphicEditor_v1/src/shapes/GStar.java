@@ -1,23 +1,17 @@
 package shapes;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 
-public class GStar extends GShape {
-	private int width;
-	private int height;
-	private Polygon starPolygon;
+public class GStar extends GPolygonShape {
+	private static final long serialVersionUID = 1L;
 
 	public GStar(Point point, int width, int height) {
-		this.point = point;
-		this.width = width;
-		this.height = height;
-		updatePolygon();
+		super(point, width, height);
 	}
 
-	private void updatePolygon() {
+	@Override
+	protected void updatePolygon() {
 		int centerX = point.x + width / 2;
 		int centerY = point.y + height / 2;
 
@@ -40,38 +34,6 @@ public class GStar extends GShape {
 			yPoints[i] = (int) (centerY + radiusY * Math.sin(angle));
 		}
 
-		starPolygon = new Polygon(xPoints, yPoints, points * 2);
-	}
-
-	@Override
-	public void draw(Graphics g) {
-		updatePolygon();
-		g.drawPolygon(starPolygon);
-
-		if (isSelected) {
-			drawSelectionBox(g);
-		}
-	}
-
-	@Override
-	public boolean isInside(Rectangle rect) {
-		return rect.contains(getBounds());
-	}
-
-	@Override
-	public void move(int dx, int dy) {
-		point.x += dx;
-		point.y += dy;
-		updatePolygon();
-	}
-
-	@Override
-	public Rectangle getBounds() {
-		return new Rectangle(point.x, point.y, width, height);
-	}
-
-	@Override
-	public boolean contains(Point p) {
-		return starPolygon.contains(p);
+		polygon = new Polygon(xPoints, yPoints, points * 2);
 	}
 }

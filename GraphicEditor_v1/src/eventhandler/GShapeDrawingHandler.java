@@ -28,9 +28,6 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 			List<MouseEvent> events = createMouseEvents(e);
 			GEventStateMananger.getInstance().setMouseEvents(events);
 			GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
-
-			// 여기서 executeAndStore가 호출되어야 함
-			System.out.println("GShapeDrawingHandler.mouseReleased - 도형 그리기 완료");
 			commandManager.executeAndStore(GMode.SHAPE);
 		}
 	}

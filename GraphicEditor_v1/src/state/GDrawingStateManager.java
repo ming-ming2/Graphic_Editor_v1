@@ -23,16 +23,31 @@ public class GDrawingStateManager extends GStateManager {
 	private Point dragStartPoint;
 	private boolean isDraggingSelection = false;
 	private File currentFile = null;
+
 	// 도형의 원본 위치 저장 맵 추가
 	private Map<GShape, Point> originalPositions = new HashMap<>();
+	// 도형의 원본 경계 저장 맵 추가
+	private Map<GShape, Rectangle> originalBounds = new HashMap<>();
+
+	// 회전 관련 상태 정보
+	private GShape targetShapeForRotation;
+	private Point rotateStartPoint;
+	private Point rotateCurrentPoint;
+	private double originalRotationAngle;
+
+	// 리사이즈 관련 상태 정보
+	private GShape targetShapeForResize;
+	private GShape.ControlPoint activeControlPoint;
 
 	/**
-	 * 현재 선택된 도형들의 원본 위치를 저장합니다. 드래그 시작 시 호출됩니다.
+	 * 현재 선택된 도형들의 원본 위치와 크기를 저장합니다. 드래그 시작 시 호출됩니다.
 	 */
 	public void saveOriginalPositions() {
 		originalPositions.clear();
+		originalBounds.clear();
 		for (GShape shape : selectedShapes) {
 			originalPositions.put(shape, new Point(shape.getBounds().x, shape.getBounds().y));
+			originalBounds.put(shape, new Rectangle(shape.getBounds()));
 		}
 	}
 
@@ -41,6 +56,14 @@ public class GDrawingStateManager extends GStateManager {
 	 */
 	public Map<GShape, Point> getOriginalPositions() {
 		return new HashMap<>(originalPositions);
+	}
+
+	/**
+	 * 저장된 원본 경계 맵에서 특정 도형의 경계를 반환합니다.
+	 */
+	public Rectangle getOriginalBounds(GShape shape) {
+		Rectangle bounds = originalBounds.get(shape);
+		return bounds != null ? new Rectangle(bounds) : null;
 	}
 
 	/**
@@ -55,19 +78,102 @@ public class GDrawingStateManager extends GStateManager {
 	}
 
 	/**
-	 * 원본 위치와 현재 위치를 비교하여 변경 여부를 반환합니다.
+	 * 원본 위치나 크기와 현재 위치나 크기를 비교하여 변경 여부를 반환합니다.
 	 */
 	public boolean hasPositionsChanged() {
-		for (GShape shape : originalPositions.keySet()) {
+		for (GShape shape : originalBounds.keySet()) {
 			if (selectedShapes.contains(shape)) {
-				Point original = originalPositions.get(shape);
-				Point current = new Point(shape.getBounds().x, shape.getBounds().y);
-				if (original.x != current.x || original.y != current.y) {
+				Rectangle origBounds = originalBounds.get(shape);
+				Rectangle currBounds = shape.getBounds();
+
+				// 위치나 크기가 변경되었는지 확인
+				if (origBounds.x != currBounds.x || origBounds.y != currBounds.y || origBounds.width != currBounds.width
+						|| origBounds.height != currBounds.height) {
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * 회전에 사용될 타겟 도형 설정
+	 */
+	public void setTargetShapeForRotation(GShape shape) {
+		this.targetShapeForRotation = shape;
+		if (shape != null) {
+			this.originalRotationAngle = shape.getRotationAngle();
+		}
+	}
+
+	/**
+	 * 회전 시작 포인트 설정
+	 */
+	public void setRotateStartPoint(Point point) {
+		this.rotateStartPoint = point;
+	}
+
+	/**
+	 * 회전 현재 포인트 설정
+	 */
+	public void setRotateCurrentPoint(Point point) {
+		this.rotateCurrentPoint = point;
+	}
+
+	/**
+	 * 회전 타겟 도형 가져오기
+	 */
+	public GShape getTargetShapeForRotation() {
+		return targetShapeForRotation;
+	}
+
+	/**
+	 * 회전 시작 포인트 가져오기
+	 */
+	public Point getRotateStartPoint() {
+		return rotateStartPoint;
+	}
+
+	/**
+	 * 회전 현재 포인트 가져오기
+	 */
+	public Point getRotateCurrentPoint() {
+		return rotateCurrentPoint;
+	}
+
+	/**
+	 * 원본 회전 각도 가져오기
+	 */
+	public double getOriginalRotationAngle() {
+		return originalRotationAngle;
+	}
+
+	/**
+	 * 리사이즈에 사용될 타겟 도형 설정
+	 */
+	public void setTargetShapeForResize(GShape shape) {
+		this.targetShapeForResize = shape;
+	}
+
+	/**
+	 * 활성화된 제어점 설정
+	 */
+	public void setActiveControlPoint(GShape.ControlPoint controlPoint) {
+		this.activeControlPoint = controlPoint;
+	}
+
+	/**
+	 * 리사이즈 타겟 도형 가져오기
+	 */
+	public GShape getTargetShapeForResize() {
+		return targetShapeForResize;
+	}
+
+	/**
+	 * 활성화된 제어점 가져오기
+	 */
+	public GShape.ControlPoint getActiveControlPoint() {
+		return activeControlPoint;
 	}
 
 	private GDrawingStateManager() {
@@ -244,5 +350,26 @@ public class GDrawingStateManager extends GStateManager {
 		}
 		dragStartPoint = newPosition;
 		notifyObservers();
+	}
+
+	/**
+	 * 회전 각도 변경이 있는지 확인
+	 */
+	public boolean hasRotationChanged() {
+		if (targetShapeForRotation == null) {
+			return false;
+		}
+		return Math.abs(originalRotationAngle - targetShapeForRotation.getRotationAngle()) > 0.001;
+	}
+
+	/**
+	 * 모든 상태 초기화
+	 */
+	public void resetOperationStates() {
+		targetShapeForRotation = null;
+		rotateStartPoint = null;
+		rotateCurrentPoint = null;
+		targetShapeForResize = null;
+		activeControlPoint = null;
 	}
 }

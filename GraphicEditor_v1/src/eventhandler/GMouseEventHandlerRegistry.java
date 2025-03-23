@@ -13,6 +13,8 @@ public class GMouseEventHandlerRegistry {
 		handlers.put(GMode.DEFAULT, new GDefaultHandler(commandManager));
 		handlers.put(GMode.SHAPE, new GShapeDrawingHandler(commandManager));
 		handlers.put(GMode.GROUP_MOVE, new GGroupMoveHandler(commandManager));
+		handlers.put(GMode.RESIZE, new GResizeHandler(commandManager));
+		handlers.put(GMode.ROTATE, new GRotateHandler(commandManager)); // 회전 핸들러 추가
 	}
 
 	public GMouseEventHandler get(GMode mode) {

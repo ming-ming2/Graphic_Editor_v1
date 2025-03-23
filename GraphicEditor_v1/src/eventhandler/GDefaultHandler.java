@@ -29,6 +29,28 @@ public class GDefaultHandler implements GMouseEventHandler {
 		eventManager.setSelectionStartPoint(startPoint);
 		eventManager.setShiftDown(e.isShiftDown());
 		eventManager.setMouseReleased(false);
+
+		// 제어점 클릭 확인
+		for (GShape shape : drawingStateManager.getSelectedShapes()) {
+			GShape.ControlPoint cp = shape.getControlPointAt(startPoint);
+			if (cp != GShape.ControlPoint.NONE) {
+				// 제어점 종류에 따라 모드 전환
+				if (cp == GShape.ControlPoint.ROTATE) {
+					// 회전 모드로 전환
+					drawingStateManager.setCurrentMode(GMode.ROTATE);
+					eventManager.setCurrentMouseEventHandler(GMode.ROTATE);
+					eventManager.getCurrentMouseEventHandler().mousePressed(e);
+					return;
+				} else {
+					// 리사이즈 모드로 전환
+					drawingStateManager.setCurrentMode(GMode.RESIZE);
+					eventManager.setCurrentMouseEventHandler(GMode.RESIZE);
+					eventManager.getCurrentMouseEventHandler().mousePressed(e);
+					return;
+				}
+			}
+		}
+
 		clickedShape = drawingStateManager.findShapeAt(startPoint);
 
 		if (clickedShape != null) {
