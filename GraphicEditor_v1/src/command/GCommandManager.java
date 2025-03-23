@@ -12,7 +12,6 @@ public class GCommandManager extends GStateManager {
 	private Stack<GCommand> undoStack = new Stack<>();
 	private Stack<GCommand> redoStack = new Stack<>();
 
-	// 현재 활성화된 명령 참조
 	private Map<GMode, GCommand> activeCommands = new HashMap<>();
 
 	private interface CommandFactory {
@@ -20,47 +19,49 @@ public class GCommandManager extends GStateManager {
 	}
 
 	public GCommandManager() {
+		// 모든 명령 팩토리를 한 곳에서 관리
 		commandFactories.put(GMode.DEFAULT, () -> new DefaultCommand());
 		commandFactories.put(GMode.SHAPE, () -> new GShapeCommand());
+
+		// 도형 조작 관련 명령
 		commandFactories.put(GMode.GROUP_MOVE, () -> {
-			// 이미 생성된 이동 명령이 있다면 재사용
 			GCommand existingCommand = activeCommands.get(GMode.GROUP_MOVE);
 			if (existingCommand != null) {
 				return existingCommand;
 			}
 
-			// 없으면 새로 생성
 			GCommand newCommand = new GGroupMoveCommand();
 			activeCommands.put(GMode.GROUP_MOVE, newCommand);
 			return newCommand;
 		});
 		commandFactories.put(GMode.RESIZE, () -> {
-			// 이미 생성된 리사이즈 명령이 있다면 재사용
 			GCommand existingCommand = activeCommands.get(GMode.RESIZE);
 			if (existingCommand != null) {
 				return existingCommand;
 			}
 
-			// 없으면 새로 생성
 			GCommand newCommand = new GResizeCommand();
 			activeCommands.put(GMode.RESIZE, newCommand);
 			return newCommand;
 		});
 		commandFactories.put(GMode.ROTATE, () -> {
-			// 이미 생성된 회전 명령이 있다면 재사용
 			GCommand existingCommand = activeCommands.get(GMode.ROTATE);
 			if (existingCommand != null) {
 				return existingCommand;
 			}
 
-			// 없으면 새로 생성
 			GCommand newCommand = new GRotateCommand();
 			activeCommands.put(GMode.ROTATE, newCommand);
 			return newCommand;
 		});
+
+		// 편집 명령
+		commandFactories.put(GMode.CUT, () -> new GCutCommand());
+		commandFactories.put(GMode.COPY, () -> new GCopyCommand());
+		commandFactories.put(GMode.PASTE, () -> new GPasteCommand());
 	}
 
-	private GCommand createCommand(GMode mode) {
+	public GCommand createCommand(GMode mode) {
 		CommandFactory factory = commandFactories.get(mode);
 		if (factory != null) {
 			return factory.createCommand();
@@ -77,9 +78,13 @@ public class GCommandManager extends GStateManager {
 	}
 
 	public void executeAndStore(GMode mode) {
-		GCommand command = activeCommands.get(mode);
+		GCommand command = null;
 
-		// 해당 모드의 명령이 없으면 새로 생성
+		// 모드에 따라 활성 명령 또는 새 명령 사용
+		if (mode == GMode.GROUP_MOVE || mode == GMode.RESIZE || mode == GMode.ROTATE) {
+			command = activeCommands.get(mode);
+		}
+
 		if (command == null) {
 			command = createCommand(mode);
 		}
@@ -87,9 +92,17 @@ public class GCommandManager extends GStateManager {
 		if (command != null) {
 			command.execute();
 
-			// 변경 사항이 있는 경우에만 스택에 저장
-			if ((mode == GMode.DEFAULT && ((DefaultCommand) command).hasChanges()) || mode != GMode.DEFAULT) {
+			// 상태 변경이 있는 명령만 스택에 저장
+			boolean shouldStore = true;
 
+			if (mode == GMode.DEFAULT) {
+				shouldStore = ((DefaultCommand) command).hasChanges();
+			} else if (mode == GMode.COPY) {
+				// COPY는 상태를 변경하지 않으므로 저장하지 않음
+				shouldStore = false;
+			}
+
+			if (shouldStore) {
 				undoStack.push(command);
 				redoStack.clear();
 				notifyObservers();
@@ -138,7 +151,6 @@ public class GCommandManager extends GStateManager {
 		}
 	}
 
-	// 현재 활성화된 명령들 초기화
 	public void resetActiveCommands() {
 		activeCommands.clear();
 	}

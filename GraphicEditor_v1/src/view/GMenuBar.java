@@ -19,9 +19,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import command.GCommandManager;
 import file.GFileManager;
+import state.GClipboard;
 import state.GDrawingStateManager;
 import state.GEventStateMananger;
 import state.GObserver;
+import type.GMode;
 
 public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver {
 	private static final long serialVersionUID = 1L;
@@ -49,11 +51,14 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 	private GDrawingPanel drawingPanel;
 	private GCommandManager commandManager;
+	private GClipboard clipboard;
 
 	public GMenuBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		this.commandManager = GEventStateMananger.getInstance().getCommandManager();
-		this.commandManager.addObserver(this); // 옵저버로 등록
+		this.clipboard = GClipboard.getInstance();
+		this.commandManager.addObserver(this);
+		this.clipboard.addObserver(this);
 	}
 
 	@Override
@@ -152,6 +157,7 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 		setMenuItemFont(zoomOutMenuItem, menuFont);
 
 		updateUndoRedoState();
+		updateClipboardState();
 	}
 
 	private void setMenuItemFont(JMenuItem item, Font font) {
@@ -161,9 +167,9 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 	@Override
 	public void update() {
 		updateUndoRedoState();
+		updateClipboardState();
 	}
 
-	// GMenuBar.java에서 updateUndoRedoState 메서드
 	public void updateUndoRedoState() {
 		boolean canUndo = commandManager.canUndo();
 		boolean canRedo = commandManager.canRedo();
@@ -172,6 +178,15 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 		undoMenuItem.setEnabled(canUndo);
 		redoMenuItem.setEnabled(canRedo);
+	}
+
+	public void updateClipboardState() {
+		boolean hasSelection = !GDrawingStateManager.getInstance().getSelectedShapes().isEmpty();
+		cutMenuItem.setEnabled(hasSelection);
+		copyMenuItem.setEnabled(hasSelection);
+
+		boolean hasClipboardContent = clipboard.hasContents();
+		pasteMenuItem.setEnabled(hasClipboardContent);
 	}
 
 	@Override
@@ -261,7 +276,6 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 
 		exitMenuItem.addActionListener(e -> System.exit(0));
 
-		// addEventHandler 메서드 내부에서
 		undoMenuItem.addActionListener(e -> {
 			System.out.println("Undo 메뉴 클릭됨");
 			if (commandManager.canUndo()) {
@@ -278,9 +292,20 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 			}
 		});
 
-		cutMenuItem.addActionListener(dummyAction);
-		copyMenuItem.addActionListener(dummyAction);
-		pasteMenuItem.addActionListener(dummyAction);
+		cutMenuItem.addActionListener(e -> {
+			System.out.println("자르기 메뉴 클릭됨");
+			commandManager.executeAndStore(GMode.CUT);
+		});
+
+		copyMenuItem.addActionListener(e -> {
+			System.out.println("복사 메뉴 클릭됨");
+			commandManager.execute(GMode.COPY);
+		});
+
+		pasteMenuItem.addActionListener(e -> {
+			System.out.println("붙여넣기 메뉴 클릭됨");
+			commandManager.executeAndStore(GMode.PASTE);
+		});
 
 		zoomInMenuItem.addActionListener(dummyAction);
 		zoomOutMenuItem.addActionListener(dummyAction);
