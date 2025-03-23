@@ -17,13 +17,11 @@ public class GShapeCommand implements GCommand {
 	public void execute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 
-		// 이미 실행된 명령인 경우 (redo를 위한 실행)
 		if (createdShape != null) {
 			drawingManager.addShape(createdShape);
 			return;
 		}
 
-		// 처음 실행되는 경우
 		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		List<MouseEvent> events = eventManager.getMouseEvents();
 		GShapeType shapeType = drawingManager.getCurrentShapeType();
@@ -33,7 +31,6 @@ public class GShapeCommand implements GCommand {
 		}
 
 		new ArrayList<>(events);
-		// 도형 생성
 		GShape shape = GShapeFactory.getShape(shapeType, events);
 
 		if (shape != null) {

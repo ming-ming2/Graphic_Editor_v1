@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -45,10 +46,8 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 	public void arrangeComponents() {
 		this.setLayout(new BorderLayout());
 
-		// 상태 메시지 영역 (왼쪽)
 		this.add(statusLabel, BorderLayout.WEST);
 
-		// 줌 컨트롤 영역 (오른쪽)
 		JPanel zoomPanel = new JPanel();
 		zoomPanel.setOpaque(false);
 		zoomPanel.add(zoomOutButton);
@@ -68,16 +67,13 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 		this.setPreferredSize(new Dimension(0, 28));
 		this.setBackground(new Color(240, 240, 240));
 
-		// 상태 레이블 설정
 		statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 		statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 
-		// 줌 레이블 설정
 		zoomLabel.setPreferredSize(new Dimension(60, 20));
 		zoomLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		zoomLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-		// 줌 버튼 설정
 		configureButton(zoomInButton, 40, 24);
 		configureButton(zoomOutButton, 40, 24);
 		configureButton(zoomResetButton, 60, 24);
@@ -87,8 +83,7 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 		button.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		button.setFocusPainted(false);
 		button.setPreferredSize(new Dimension(width, height));
-		button.setMargin(new java.awt.Insets(2, 4, 2, 4));
-		// 버튼 배경 색상을 조금 더 밝게
+		button.setMargin(new Insets(2, 4, 2, 4));
 		button.setBackground(new Color(250, 250, 250));
 		button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)),
 				BorderFactory.createEmptyBorder(2, 4, 2, 4)));
@@ -122,7 +117,6 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 
 	@Override
 	public void update() {
-		// 줌 레벨 업데이트
 		zoomLabel.setText(GZoomManager.getInstance().getZoomPercentage());
 	}
 

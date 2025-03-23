@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -62,13 +64,13 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		this.add(leftPanel);
 		this.add(centerPanel);
 		this.add(rightPanel);
+		this.setLayout(new GridLayout(1, 3));
 	}
 
 	@Override
 	public void setAttributes() {
 		this.setFloatable(false);
 		this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-		this.setLayout(new GridLayout(1, 3));
 		this.setPreferredSize(new Dimension(0, getToolbarHeight()));
 		this.setBackground(new Color(240, 240, 240));
 
@@ -113,13 +115,11 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 
 		int scrollHeight = getToolbarHeight() - 2 * getToolbarMargin();
 		scrollPane.setPreferredSize(new Dimension(panelWidth + getScrollBarWidth(), scrollHeight));
-
 		scrollPane.getVerticalScrollBar().setUnitIncrement(getButtonSize() / 2);
 		scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(getScrollBarWidth(), 0));
 		scrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
 		sectionPanel.add(scrollPane);
-
 		return sectionPanel;
 	}
 
@@ -135,6 +135,7 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		addShapeButton(panel, "오각형", GShapeType.Pentagon);
 		addShapeButton(panel, "육각형", GShapeType.Hexagon);
 		addShapeButton(panel, "별", GShapeType.Star);
+		addShapeButton(panel, "텍스트상자", null);
 	}
 
 	private JButton addShapeButton(JPanel panel, String tooltip, GShapeType shapeType) {
@@ -145,14 +146,18 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		button.setPreferredSize(buttonSize);
 		button.setMinimumSize(buttonSize);
 		button.setMaximumSize(buttonSize);
-
 		button.setMargin(new Insets(0, 0, 0, 0));
 		button.setFocusPainted(false);
 		button.setContentAreaFilled(true);
 		button.setBorderPainted(false);
 		button.setBackground(Color.WHITE);
 		button.setOpaque(true);
-		button.setIcon(createShapeIcon(shapeType));
+
+		if (tooltip.equals("텍스트상자")) {
+			button.setIcon(createTextBoxIcon());
+		} else {
+			button.setIcon(createShapeIcon(shapeType));
+		}
 
 		button.addMouseListener(new MouseAdapter() {
 			@Override
@@ -181,7 +186,6 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 
 					drawingStateManager.setCurrentMode(GMode.DEFAULT);
 					drawingStateManager.setCurrentShapeType(null);
-					System.out.println("Toggled OFF - Mode: DEFAULT");
 				} else {
 					if (currentSelectedButton != null) {
 						currentSelectedButton.setBackground(Color.WHITE);
@@ -190,9 +194,11 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 					button.setBackground(selectedColor);
 					currentSelectedButton = button;
 
-					drawingStateManager.setCurrentShapeType(shapeType);
-					drawingStateManager.setCurrentMode(GMode.SHAPE);
-					System.out.println("Toggled ON - Selected shape: " + shapeType);
+					if (tooltip.equals("텍스트상자")) {
+					} else {
+						drawingStateManager.setCurrentShapeType(shapeType);
+						drawingStateManager.setCurrentMode(GMode.SHAPE);
+					}
 				}
 			}
 		});
@@ -200,6 +206,53 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		panel.add(button);
 		shapeButtons.add(button);
 		return button;
+	}
+
+	private Icon createTextBoxIcon() {
+		return new Icon() {
+			@Override
+			public void paintIcon(Component c, Graphics g, int x, int y) {
+				Graphics2D g2d = (Graphics2D) g.create();
+				g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2d.setColor(Color.BLACK);
+
+				int iconSize = getIconSize();
+				int padding = (getButtonSize() - iconSize) / 2;
+
+				int width = iconSize;
+				int height = iconSize;
+
+				int offsetX = x + padding;
+				int offsetY = y + padding;
+
+				float[] dash = { 2.0f, 2.0f };
+				g2d.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+				g2d.drawRect(offsetX, offsetY, width, height);
+
+				int fontSize = iconSize / 2;
+				g2d.setFont(new Font("맑은 고딕", Font.BOLD, fontSize));
+				FontMetrics fm = g2d.getFontMetrics();
+				String text = "T";
+				int textWidth = fm.stringWidth(text);
+				int textHeight = fm.getAscent() + fm.getDescent();
+
+				int textX = offsetX + (width - textWidth) / 2;
+				int textY = offsetY + (height + textHeight) / 2 - fm.getDescent() / 2;
+
+				g2d.drawString(text, textX, textY);
+				g2d.dispose();
+			}
+
+			@Override
+			public int getIconWidth() {
+				return getButtonSize();
+			}
+
+			@Override
+			public int getIconHeight() {
+				return getButtonSize();
+			}
+		};
 	}
 
 	private Icon createShapeIcon(GShapeType shapeType) {
@@ -221,42 +274,18 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 				int offsetY = y + padding;
 
 				switch (shapeType) {
-				case Line:
-					g2d.drawLine(offsetX, offsetY, offsetX + width, offsetY + height);
-					break;
-				case Arrow:
-					drawArrow(g2d, offsetX, offsetY + height / 2, offsetX + width, offsetY + height / 2);
-					break;
-				case Rectangle:
-					g2d.drawRect(offsetX, offsetY, width, height);
-					break;
-				case RoundRectangle:
-					g2d.drawRoundRect(offsetX, offsetY, width, height, width / 4, height / 4);
-					break;
-				case Oval:
-					g2d.drawOval(offsetX, offsetY, width, height);
-					break;
-				case Diamond:
-					drawDiamond(g2d, offsetX, offsetY, width, height);
-					break;
-				case Triangle:
-					drawTriangle(g2d, offsetX, offsetY, width, height);
-					break;
-				case RightTriangle:
-					drawRightTriangle(g2d, offsetX, offsetY, width, height);
-					break;
-				case Pentagon:
-					drawPolygon(g2d, offsetX, offsetY, width, height, 5);
-					break;
-				case Hexagon:
-					drawPolygon(g2d, offsetX, offsetY, width, height, 6);
-					break;
-				case Star:
-					drawStar(g2d, offsetX, offsetY, width, height);
-					break;
-				default:
-					g2d.drawRect(offsetX, offsetY, width, height);
-					break;
+				case Line -> g2d.drawLine(offsetX, offsetY, offsetX + width, offsetY + height);
+				case Arrow -> drawArrow(g2d, offsetX, offsetY + height / 2, offsetX + width, offsetY + height / 2);
+				case Rectangle -> g2d.drawRect(offsetX, offsetY, width, height);
+				case RoundRectangle -> g2d.drawRoundRect(offsetX, offsetY, width, height, width / 4, height / 4);
+				case Oval -> g2d.drawOval(offsetX, offsetY, width, height);
+				case Diamond -> drawDiamond(g2d, offsetX, offsetY, width, height);
+				case Triangle -> drawTriangle(g2d, offsetX, offsetY, width, height);
+				case RightTriangle -> drawRightTriangle(g2d, offsetX, offsetY, width, height);
+				case Pentagon -> drawPolygon(g2d, offsetX, offsetY, width, height, 5);
+				case Hexagon -> drawPolygon(g2d, offsetX, offsetY, width, height, 6);
+				case Star -> drawStar(g2d, offsetX, offsetY, width, height);
+				default -> g2d.drawRect(offsetX, offsetY, width, height);
 				}
 
 				g2d.dispose();
@@ -276,9 +305,7 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 
 	private void drawArrow(Graphics2D g2d, int x1, int y1, int x2, int y2) {
 		g2d.drawLine(x1, y1, x2, y2);
-
 		int arrowSize = getIconSize() / 5;
-
 		g2d.drawLine(x2, y2, x2 - arrowSize, y2 - arrowSize / 2);
 		g2d.drawLine(x2, y2, x2 - arrowSize, y2 + arrowSize / 2);
 	}
@@ -286,33 +313,27 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 	private void drawDiamond(Graphics2D g2d, int x, int y, int width, int height) {
 		int[] xPoints = { x + width / 2, x + width, x + width / 2, x };
 		int[] yPoints = { y, y + height / 2, y + height, y + height / 2 };
-
 		g2d.drawPolygon(xPoints, yPoints, 4);
 	}
 
 	private void drawTriangle(Graphics2D g2d, int x, int y, int width, int height) {
 		int[] xPoints = { x + width / 2, x + width, x };
 		int[] yPoints = { y, y + height, y + height };
-
 		g2d.drawPolygon(xPoints, yPoints, 3);
 	}
 
 	private void drawRightTriangle(Graphics2D g2d, int x, int y, int width, int height) {
 		int[] xPoints = { x, x + width, x };
 		int[] yPoints = { y, y + height, y + height };
-
 		g2d.drawPolygon(xPoints, yPoints, 3);
 	}
 
-	// GToolBar 클래스의 기존 drawPolygon 메서드를 수정
 	private void drawPolygon(Graphics2D g2d, int x, int y, int width, int height, int sides) {
 		int[] xPoints = new int[sides];
 		int[] yPoints = new int[sides];
 
 		int centerX = x + width / 2;
 		int centerY = y + height / 2;
-
-		// 타원형 기반으로 다각형 그리기
 		int radiusX = width / 2;
 		int radiusY = height / 2;
 
@@ -325,19 +346,16 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 		g2d.drawPolygon(xPoints, yPoints, sides);
 	}
 
-	// GToolBar 클래스의 기존 drawStar 메서드를 수정
 	private void drawStar(Graphics2D g2d, int x, int y, int width, int height) {
 		int centerX = x + width / 2;
 		int centerY = y + height / 2;
 
-		// 타원형 기반으로 별 그리기
 		int outerRadiusX = width / 2;
 		int outerRadiusY = height / 2;
 		int innerRadiusX = outerRadiusX / 2;
 		int innerRadiusY = outerRadiusY / 2;
 
 		int points = 5;
-
 		int[] xPoints = new int[points * 2];
 		int[] yPoints = new int[points * 2];
 
@@ -385,6 +403,6 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 	}
 
 	private int getTotalShapeCount() {
-		return 11;
+		return 12;
 	}
 }

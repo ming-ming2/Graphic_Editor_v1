@@ -30,19 +30,15 @@ public class GDefaultHandler implements GMouseEventHandler {
 		eventManager.setShiftDown(e.isShiftDown());
 		eventManager.setMouseReleased(false);
 
-		// 제어점 클릭 확인
 		for (GShape shape : drawingStateManager.getSelectedShapes()) {
 			GShape.ControlPoint cp = shape.getControlPointAt(startPoint);
 			if (cp != GShape.ControlPoint.NONE) {
-				// 제어점 종류에 따라 모드 전환
 				if (cp == GShape.ControlPoint.ROTATE) {
-					// 회전 모드로 전환
 					drawingStateManager.setCurrentMode(GMode.ROTATE);
 					eventManager.setCurrentMouseEventHandler(GMode.ROTATE);
 					eventManager.getCurrentMouseEventHandler().mousePressed(e);
 					return;
 				} else {
-					// 리사이즈 모드로 전환
 					drawingStateManager.setCurrentMode(GMode.RESIZE);
 					eventManager.setCurrentMouseEventHandler(GMode.RESIZE);
 					eventManager.getCurrentMouseEventHandler().mousePressed(e);
@@ -59,8 +55,6 @@ public class GDefaultHandler implements GMouseEventHandler {
 			drawingStateManager.setDragStartPoint(startPoint);
 			drawingStateManager.setDraggingSelection(true);
 			drawingStateManager.setCurrentMode(GMode.GROUP_MOVE);
-
-			// 명령 객체가 생성 및 초기화됨 (원본 위치 저장됨)
 			commandManager.execute(GMode.GROUP_MOVE);
 		} else if (!e.isShiftDown()) {
 			drawingStateManager.clearSelection();
@@ -81,7 +75,6 @@ public class GDefaultHandler implements GMouseEventHandler {
 		eventManager.setMouseReleased(false);
 
 		if (isMovingShape && !drawingStateManager.getSelectedShapes().isEmpty()) {
-			// 명령 객체를 통해 도형 이동
 			commandManager.execute(GMode.GROUP_MOVE);
 		} else {
 			commandManager.execute(GMode.DEFAULT);
@@ -95,10 +88,8 @@ public class GDefaultHandler implements GMouseEventHandler {
 		eventManager.setMouseReleased(true);
 
 		if (isMovingShape) {
-			// 마지막으로 명령 실행 (최종 위치 저장)
 			commandManager.execute(GMode.GROUP_MOVE);
 			drawingStateManager.setDraggingSelection(false);
-			// 명령을 스택에 저장 (변경 사항이 있는 경우에만)
 			commandManager.executeAndStore(GMode.GROUP_MOVE);
 			drawingStateManager.setCurrentMode(GMode.DEFAULT);
 		} else if (startPoint != null) {

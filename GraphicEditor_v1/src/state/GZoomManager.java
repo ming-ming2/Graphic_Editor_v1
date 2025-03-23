@@ -9,21 +9,10 @@ public class GZoomManager extends GStateManager {
 	private static GZoomManager instance;
 
 	private double zoomFactor = 1.0;
-	private int zoomLevelIndex = 5; // 기본값 (100%)
+	private int zoomLevelIndex = 5;
 
-	private static final List<Double> ZOOM_LEVELS = Arrays.asList(0.1, // 10%
-			0.25, // 25%
-			0.5, // 50%
-			0.75, // 75%
-			0.9, // 90%
-			1.0, // 100% (기본값)
-			1.25, // 125%
-			1.5, // 150%
-			2.0, // 200%
-			3.0, // 300%
-			4.0, // 400%
-			5.0 // 500%
-	);
+	private static final List<Double> ZOOM_LEVELS = Arrays.asList(0.1, 0.25, 0.5, 0.75, 0.9, 1.0, 1.25, 1.5, 2.0, 3.0,
+			4.0, 5.0);
 
 	private GZoomManager() {
 	}
@@ -60,7 +49,7 @@ public class GZoomManager extends GStateManager {
 	}
 
 	public void resetZoom() {
-		zoomLevelIndex = 5; // 100% 인덱스
+		zoomLevelIndex = 5;
 		zoomFactor = ZOOM_LEVELS.get(zoomLevelIndex);
 		notifyObservers();
 	}
@@ -69,7 +58,6 @@ public class GZoomManager extends GStateManager {
 		if (factor >= ZOOM_LEVELS.get(0) && factor <= ZOOM_LEVELS.get(ZOOM_LEVELS.size() - 1)) {
 			zoomFactor = factor;
 
-			// 가장 가까운 줌 레벨 인덱스 찾기
 			int closestIndex = 0;
 			double minDiff = Math.abs(ZOOM_LEVELS.get(0) - factor);
 
@@ -86,23 +74,19 @@ public class GZoomManager extends GStateManager {
 		}
 	}
 
-	// 모델 좌표를 화면 좌표로 변환
 	public Point modelToView(Point modelPoint) {
 		return new Point((int) (modelPoint.x * zoomFactor), (int) (modelPoint.y * zoomFactor));
 	}
 
-	// 화면 좌표를 모델 좌표로 변환
 	public Point viewToModel(Point viewPoint) {
 		return new Point((int) (viewPoint.x / zoomFactor), (int) (viewPoint.y / zoomFactor));
 	}
 
-	// 모델 사각형을 화면 사각형으로 변환
 	public Rectangle modelToView(Rectangle modelRect) {
 		return new Rectangle((int) (modelRect.x * zoomFactor), (int) (modelRect.y * zoomFactor),
 				(int) (modelRect.width * zoomFactor), (int) (modelRect.height * zoomFactor));
 	}
 
-	// 화면 사각형을 모델 사각형으로 변환
 	public Rectangle viewToModel(Rectangle viewRect) {
 		return new Rectangle((int) (viewRect.x / zoomFactor), (int) (viewRect.y / zoomFactor),
 				(int) (viewRect.width / zoomFactor), (int) (viewRect.height / zoomFactor));

@@ -13,7 +13,6 @@ public class GCommandManager extends GStateManager {
 	private final Map<GZoomType, CommandFactory> zoomCommandFactories = new HashMap<>();
 	private Stack<GCommand> undoStack = new Stack<>();
 	private Stack<GCommand> redoStack = new Stack<>();
-
 	private Map<GMode, GCommand> activeCommands = new HashMap<>();
 
 	private interface CommandFactory {
@@ -21,48 +20,40 @@ public class GCommandManager extends GStateManager {
 	}
 
 	public GCommandManager() {
-		// 모든 명령 팩토리를 한 곳에서 관리
 		commandFactories.put(GMode.DEFAULT, () -> new DefaultCommand());
 		commandFactories.put(GMode.SHAPE, () -> new GShapeCommand());
 
-		// 도형 조작 관련 명령
 		commandFactories.put(GMode.GROUP_MOVE, () -> {
 			GCommand existingCommand = activeCommands.get(GMode.GROUP_MOVE);
-			if (existingCommand != null) {
+			if (existingCommand != null)
 				return existingCommand;
-			}
-
 			GCommand newCommand = new GGroupMoveCommand();
 			activeCommands.put(GMode.GROUP_MOVE, newCommand);
 			return newCommand;
 		});
+
 		commandFactories.put(GMode.RESIZE, () -> {
 			GCommand existingCommand = activeCommands.get(GMode.RESIZE);
-			if (existingCommand != null) {
+			if (existingCommand != null)
 				return existingCommand;
-			}
-
 			GCommand newCommand = new GResizeCommand();
 			activeCommands.put(GMode.RESIZE, newCommand);
 			return newCommand;
 		});
+
 		commandFactories.put(GMode.ROTATE, () -> {
 			GCommand existingCommand = activeCommands.get(GMode.ROTATE);
-			if (existingCommand != null) {
+			if (existingCommand != null)
 				return existingCommand;
-			}
-
 			GCommand newCommand = new GRotateCommand();
 			activeCommands.put(GMode.ROTATE, newCommand);
 			return newCommand;
 		});
 
-		// 편집 명령
 		commandFactories.put(GMode.CUT, () -> new GCutCommand());
 		commandFactories.put(GMode.COPY, () -> new GCopyCommand());
 		commandFactories.put(GMode.PASTE, () -> new GPasteCommand());
 
-		// 줌 명령 팩토리 설정
 		zoomCommandFactories.put(GZoomType.ZOOM_IN, () -> new GZoomCommand(GZoomType.ZOOM_IN));
 		zoomCommandFactories.put(GZoomType.ZOOM_OUT, () -> new GZoomCommand(GZoomType.ZOOM_OUT));
 		zoomCommandFactories.put(GZoomType.ZOOM_RESET, () -> new GZoomCommand(GZoomType.ZOOM_RESET));
@@ -70,40 +61,35 @@ public class GCommandManager extends GStateManager {
 
 	public GCommand createCommand(GMode mode) {
 		CommandFactory factory = commandFactories.get(mode);
-		if (factory != null) {
+		if (factory != null)
 			return factory.createCommand();
-		}
 		System.err.println("알 수 없는 모드: " + mode);
 		return null;
 	}
 
 	public GCommand createZoomCommand(GZoomType zoomType) {
 		CommandFactory factory = zoomCommandFactories.get(zoomType);
-		if (factory != null) {
+		if (factory != null)
 			return factory.createCommand();
-		}
 		System.err.println("알 수 없는 줌 타입: " + zoomType);
 		return null;
 	}
 
 	public void execute(GMode mode) {
 		GCommand command = createCommand(mode);
-		if (command != null) {
+		if (command != null)
 			command.execute();
-		}
 	}
 
 	public void execute(GZoomType zoomType) {
 		GCommand command = createZoomCommand(zoomType);
-		if (command != null) {
+		if (command != null)
 			command.execute();
-		}
 	}
 
 	public void executeAndStore(GMode mode) {
 		GCommand command = null;
 
-		// 모드에 따라 활성 명령 또는 새 명령 사용
 		if (mode == GMode.GROUP_MOVE || mode == GMode.RESIZE || mode == GMode.ROTATE) {
 			command = activeCommands.get(mode);
 		}
@@ -115,13 +101,11 @@ public class GCommandManager extends GStateManager {
 		if (command != null) {
 			command.execute();
 
-			// 상태 변경이 있는 명령만 스택에 저장
 			boolean shouldStore = true;
 
 			if (mode == GMode.DEFAULT) {
 				shouldStore = ((DefaultCommand) command).hasChanges();
 			} else if (mode == GMode.COPY) {
-				// COPY는 상태를 변경하지 않으므로 저장하지 않음
 				shouldStore = false;
 			}
 
@@ -130,8 +114,6 @@ public class GCommandManager extends GStateManager {
 				redoStack.clear();
 				notifyObservers();
 				System.out.println("명령 스택에 추가: " + command.getClass().getSimpleName());
-
-				// 스택에 저장된 명령은 더 이상 활성 명령이 아님
 				activeCommands.remove(mode);
 			}
 		}

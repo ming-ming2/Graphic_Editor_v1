@@ -51,7 +51,6 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 
 		this.add(statusBar, BorderLayout.SOUTH);
 
-		// 줌 매니저에 상태표시줄 옵저버 등록
 		GZoomManager.getInstance().addObserver(statusBar);
 	}
 
@@ -63,7 +62,6 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// 스크롤 패널 설정
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
