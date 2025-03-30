@@ -23,7 +23,9 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 	private List<GContainerInterface> components = new ArrayList<>();
 
 	public GMainFrame() {
-
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
 	}
 
 	@Override
@@ -56,6 +58,7 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 
 	@Override
 	public void setAttributes() {
+		this.setVisible(true);
 		this.setTitle("Graphic Editor_V1");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setSize((int) (dim.width / 2.), dim.height * 2 / 3);
@@ -75,10 +78,6 @@ public class GMainFrame extends JFrame implements GContainerInterface {
 
 	@Override
 	public void initialize() {
-		createComponents();
-		arrangeComponents();
-		setAttributes();
-		addEventHandler();
 		for (GContainerInterface component : components) {
 			component.initialize();
 		}

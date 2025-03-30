@@ -47,6 +47,11 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 		drawingStateManager.addObserver(this);
 		eventStateManager.addObserver(this);
 		zoomManager.addObserver(this);
+
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
 	}
 
 	public void setBackgroundImage(BufferedImage image) {
@@ -56,6 +61,11 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 
 	public BufferedImage getBackgroundImage() {
 		return backgroundImage;
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

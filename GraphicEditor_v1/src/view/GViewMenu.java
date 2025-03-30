@@ -23,6 +23,15 @@ public class GViewMenu extends JMenu implements GContainerInterface {
 	public GViewMenu(GCommandManager commandManager) {
 		super("보기");
 		this.commandManager = commandManager;
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

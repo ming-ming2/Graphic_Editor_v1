@@ -31,6 +31,15 @@ public class GStatusBar extends JPanel implements GContainerInterface, GObserver
 	private JButton zoomResetButton;
 
 	public GStatusBar() {
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

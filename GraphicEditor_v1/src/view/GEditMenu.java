@@ -28,6 +28,15 @@ public class GEditMenu extends JMenu implements GContainerInterface {
 	public GEditMenu(GCommandManager commandManager) {
 		super("편집");
 		this.commandManager = commandManager;
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

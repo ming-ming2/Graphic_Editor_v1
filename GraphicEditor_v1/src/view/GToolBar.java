@@ -47,6 +47,15 @@ public class GToolBar extends JToolBar implements GContainerInterface {
 	private JPanel rightPanel;
 
 	public GToolBar() {
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

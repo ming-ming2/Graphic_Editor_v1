@@ -32,6 +32,15 @@ public class GFileMenu extends JMenu implements GContainerInterface {
 	public GFileMenu(GDrawingPanel drawingPanel) {
 		super("파일");
 		this.drawingPanel = drawingPanel;
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

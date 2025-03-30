@@ -2,9 +2,10 @@ package view;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JMenuBar;
+import javax.swing.*;
 
 import command.GCommandManager;
 import state.GClipboard;
@@ -25,6 +26,8 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 	private GClipboard clipboard;
 	private GZoomManager zoomManager;
 
+	private List<GContainerInterface> menus = new ArrayList<>();
+
 	public GMenuBar(GDrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		this.commandManager = GEventStateMananger.getInstance().getCommandManager();
@@ -34,6 +37,17 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 		this.commandManager.addObserver(this);
 		this.clipboard.addObserver(this);
 		this.zoomManager.addObserver(this);
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+		for(GContainerInterface menu : menus) {
+			menu.initialize();
+		}
 	}
 
 	@Override
@@ -42,6 +56,11 @@ public class GMenuBar extends JMenuBar implements GContainerInterface, GObserver
 		editMenu = new GEditMenu(commandManager);
 		viewMenu = new GViewMenu(commandManager);
 		graphicMenu = new GGraphicMenu();
+
+		menus.add(fileMenu);
+		menus.add(editMenu);
+		menus.add(viewMenu);
+		menus.add(graphicMenu);
 	}
 
 	@Override

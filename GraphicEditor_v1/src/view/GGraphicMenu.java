@@ -17,6 +17,15 @@ public class GGraphicMenu extends JMenu implements GContainerInterface {
 
 	public GGraphicMenu() {
 		super("그래픽");
+		this.createComponents();
+		this.setAttributes();
+		this.arrangeComponents();
+		this.addEventHandler();
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override
