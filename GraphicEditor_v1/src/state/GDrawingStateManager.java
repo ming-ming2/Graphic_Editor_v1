@@ -17,7 +17,7 @@ public class GDrawingStateManager extends GStateManager {
 
 	private GMode currentMode;
 	private GShapeType currentShapeType;
-	private GShape previewShape;
+	private boolean isMouseReleased = true;
 
 	private List<GShape> shapes = new ArrayList<>();
 	private List<GShape> selectedShapes = new ArrayList<>();
@@ -42,7 +42,6 @@ public class GDrawingStateManager extends GStateManager {
 	private GDrawingStateManager() {
 		this.currentMode = GMode.DEFAULT;
 		this.currentShapeType = null;
-		this.previewShape = null;
 	}
 
 	public static GDrawingStateManager getInstance() {
@@ -50,6 +49,15 @@ public class GDrawingStateManager extends GStateManager {
 			drawingStateManager = new GDrawingStateManager();
 		}
 		return drawingStateManager;
+	}
+
+	public boolean isMouseReleased() {
+		return isMouseReleased;
+	}
+
+	public void setMouseReleased(boolean mouseReleased) {
+		this.isMouseReleased = mouseReleased;
+		notifyObservers();
 	}
 
 	public File getCurrentFile() {
@@ -75,15 +83,6 @@ public class GDrawingStateManager extends GStateManager {
 
 	public void setCurrentShapeType(GShapeType shapeType) {
 		this.currentShapeType = shapeType;
-	}
-
-	public GShape getPreviewShape() {
-		return previewShape;
-	}
-
-	public void setPreviewShape(GShape shape) {
-		this.previewShape = shape;
-		notifyObservers();
 	}
 
 	public List<GShape> getShapes() {

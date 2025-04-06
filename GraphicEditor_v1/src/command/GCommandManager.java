@@ -76,9 +76,20 @@ public class GCommandManager extends GStateManager {
 	}
 
 	public void execute(GMode mode) {
-		GCommand command = createCommand(mode);
-		if (command != null)
+		GCommand command = null;
+
+		if (activeCommands.containsKey(mode)) {
+			command = activeCommands.get(mode);
+		} else {
+			command = createCommand(mode);
+			if (mode == GMode.SHAPE || mode == GMode.GROUP_MOVE || mode == GMode.RESIZE || mode == GMode.ROTATE) {
+				activeCommands.put(mode, command);
+			}
+		}
+
+		if (command != null) {
 			command.execute();
+		}
 	}
 
 	public void execute(GZoomType zoomType) {
@@ -170,4 +181,13 @@ public class GCommandManager extends GStateManager {
 	public void resetActiveCommands() {
 		activeCommands.clear();
 	}
+
+	public GCommand getCurrentCommand(GMode mode) {
+		return activeCommands.get(mode);
+	}
+
+	public GCommand getActiveCommand(GMode mode) {
+		return activeCommands.get(mode);
+	}
+
 }

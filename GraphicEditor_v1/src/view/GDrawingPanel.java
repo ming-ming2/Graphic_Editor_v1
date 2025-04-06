@@ -12,19 +12,20 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import command.GCommand;
+import command.GShapeCommand;
 import shapes.GShape;
 import state.GDrawingStateManager;
 import state.GEventStateMananger;
 import state.GObserver;
 import state.GZoomManager;
+import type.GMode;
 
 public class GDrawingPanel extends JPanel implements GContainerInterface, GObserver {
 	private static final long serialVersionUID = 1L;
@@ -36,22 +37,26 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 	private GEventStateMananger eventStateManager;
 	private GZoomManager zoomManager;
 
-	private boolean isDragging = false;
 	private BufferedImage backgroundImage = null;
+	private MouseHandler mouseHandler;
 
 	public GDrawingPanel() {
 		this.drawingStateManager = GDrawingStateManager.getInstance();
 		this.eventStateManager = GEventStateMananger.getInstance();
 		this.zoomManager = GZoomManager.getInstance();
+		this.mouseHandler = new MouseHandler();
 
+		registerObservers();
+		createComponents();
+		setAttributes();
+		arrangeComponents();
+		addEventHandler();
+	}
+
+	private void registerObservers() {
 		drawingStateManager.addObserver(this);
 		eventStateManager.addObserver(this);
 		zoomManager.addObserver(this);
-
-		this.createComponents();
-		this.setAttributes();
-		this.arrangeComponents();
-		this.addEventHandler();
 	}
 
 	public void setBackgroundImage(BufferedImage image) {
@@ -65,7 +70,6 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 
 	@Override
 	public void initialize() {
-
 	}
 
 	@Override
@@ -91,94 +95,9 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 
 	@Override
 	public void addEventHandler() {
-		this.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON1) {
-					Point modelPoint = zoomManager.viewToModel(e.getPoint());
-
-					MouseEvent modelEvent = new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(),
-							modelPoint.x, modelPoint.y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
-
-					eventStateManager.setCurrentPoint(modelPoint);
-					eventStateManager.getCurrentMouseEventHandler().mousePressed(modelEvent);
-					isDragging = true;
-				}
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON1 && isDragging) {
-					Point modelPoint = zoomManager.viewToModel(e.getPoint());
-
-					MouseEvent modelEvent = new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(),
-							modelPoint.x, modelPoint.y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
-
-					eventStateManager.setCurrentPoint(modelPoint);
-					eventStateManager.getCurrentMouseEventHandler().mouseReleased(modelEvent);
-					isDragging = false;
-				}
-			}
-		});
-
-		this.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				if (isDragging) {
-					Point modelPoint = zoomManager.viewToModel(e.getPoint());
-
-					MouseEvent modelEvent = new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(),
-							modelPoint.x, modelPoint.y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
-
-					eventStateManager.setCurrentPoint(modelPoint);
-					eventStateManager.getCurrentMouseEventHandler().mouseDragged(modelEvent);
-				}
-			}
-
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				Point modelPoint = zoomManager.viewToModel(e.getPoint());
-				eventStateManager.setCurrentPoint(modelPoint);
-
-				for (GShape shape : drawingStateManager.getSelectedShapes()) {
-					GShape.ControlPoint cp = shape.getControlPointAt(modelPoint);
-					if (cp != GShape.ControlPoint.NONE) {
-						switch (cp) {
-						case TOP_LEFT, BOTTOM_RIGHT -> setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
-						case TOP_RIGHT, BOTTOM_LEFT -> setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));
-						case TOP, BOTTOM -> setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-						case LEFT, RIGHT -> setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-						case ROTATE -> setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-						default -> setCursor(Cursor.getDefaultCursor());
-						}
-						return;
-					}
-				}
-
-				GShape shapeUnderMouse = drawingStateManager.findShapeAt(modelPoint);
-				if (shapeUnderMouse != null) {
-					setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-				} else {
-					setCursor(Cursor.getDefaultCursor());
-				}
-			}
-		});
-
-		this.addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (e.isControlDown()) {
-					if (e.getWheelRotation() < 0) {
-						zoomManager.zoomIn();
-					} else {
-						zoomManager.zoomOut();
-					}
-					revalidate();
-					adjustScrollPosition(e.getPoint());
-					e.consume();
-				}
-			}
-		});
+		this.addMouseListener(mouseHandler);
+		this.addMouseMotionListener(mouseHandler);
+		this.addMouseWheelListener(mouseHandler);
 	}
 
 	@Override
@@ -200,8 +119,19 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 			shape.draw(g);
 		}
 
-		if (drawingStateManager.getPreviewShape() != null) {
-			drawingStateManager.getPreviewShape().draw(g);
+		if (!drawingStateManager.isMouseReleased() && drawingStateManager.getCurrentMode() == GMode.SHAPE) {
+			Graphics2D g2dXor = (Graphics2D) g2d.create();
+			g2dXor.setXORMode(Color.LIGHT_GRAY);
+
+			GCommand currentCommand = eventStateManager.getCommandManager().getActiveCommand(GMode.SHAPE);
+
+			if (currentCommand instanceof GShapeCommand) {
+				GShape previewShape = ((GShapeCommand) currentCommand).getLastPreviewShape();
+				if (previewShape != null) {
+					previewShape.draw(g2dXor);
+				}
+			}
+			g2dXor.dispose();
 		}
 
 		drawSelectionArea(g2d);
@@ -235,5 +165,110 @@ public class GDrawingPanel extends JPanel implements GContainerInterface, GObser
 	public void update() {
 		revalidate();
 		repaint();
+	}
+
+	private class MouseHandler extends MouseAdapter {
+		private boolean isDragging = false;
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				Point modelPoint = zoomManager.viewToModel(e.getPoint());
+				MouseEvent modelEvent = createModelEvent(e, modelPoint);
+
+				eventStateManager.setCurrentPoint(modelPoint);
+				eventStateManager.getCurrentMouseEventHandler().mousePressed(modelEvent);
+				isDragging = true;
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON1 && isDragging) {
+				Point modelPoint = zoomManager.viewToModel(e.getPoint());
+				MouseEvent modelEvent = createModelEvent(e, modelPoint);
+
+				eventStateManager.setCurrentPoint(modelPoint);
+				eventStateManager.getCurrentMouseEventHandler().mouseReleased(modelEvent);
+				isDragging = false;
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if (isDragging) {
+				Point modelPoint = zoomManager.viewToModel(e.getPoint());
+				MouseEvent modelEvent = createModelEvent(e, modelPoint);
+
+				eventStateManager.setCurrentPoint(modelPoint);
+				eventStateManager.getCurrentMouseEventHandler().mouseDragged(modelEvent);
+			}
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			Point modelPoint = zoomManager.viewToModel(e.getPoint());
+			eventStateManager.setCurrentPoint(modelPoint);
+			updateCursor(modelPoint);
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			if (e.isControlDown()) {
+				if (e.getWheelRotation() < 0) {
+					zoomManager.zoomIn();
+				} else {
+					zoomManager.zoomOut();
+				}
+				revalidate();
+				adjustScrollPosition(e.getPoint());
+				e.consume();
+			}
+		}
+
+		private MouseEvent createModelEvent(MouseEvent e, Point modelPoint) {
+			return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), modelPoint.x,
+					modelPoint.y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
+		}
+
+		private void updateCursor(Point modelPoint) {
+			for (GShape shape : drawingStateManager.getSelectedShapes()) {
+				GShape.ControlPoint cp = shape.getControlPointAt(modelPoint);
+				if (cp != GShape.ControlPoint.NONE) {
+					setCursorForControlPoint(cp);
+					return;
+				}
+			}
+
+			GShape shapeUnderMouse = drawingStateManager.findShapeAt(modelPoint);
+			if (shapeUnderMouse != null) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			} else {
+				setCursor(Cursor.getDefaultCursor());
+			}
+		}
+
+		private void setCursorForControlPoint(GShape.ControlPoint cp) {
+			switch (cp) {
+			case TOP_LEFT, BOTTOM_RIGHT:
+				setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
+				break;
+			case TOP_RIGHT, BOTTOM_LEFT:
+				setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));
+				break;
+			case TOP, BOTTOM:
+				setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+				break;
+			case LEFT, RIGHT:
+				setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+				break;
+			case ROTATE:
+				setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				break;
+			default:
+				setCursor(Cursor.getDefaultCursor());
+				break;
+			}
+		}
 	}
 }

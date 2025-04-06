@@ -131,9 +131,11 @@ public class GEventStateMananger extends GStateManager {
 
 	public void setMouseReleased(boolean released) {
 		this.isMouseReleased = released;
+
 	}
 
 	public boolean isMouseReleased() {
 		return isMouseReleased;
 	}
+
 }

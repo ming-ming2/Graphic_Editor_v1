@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import command.GCommandManager;
+import state.GDrawingStateManager;
 import state.GEventStateMananger;
 import type.GMode;
 
@@ -20,6 +21,8 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 	public void mousePressed(MouseEvent e) {
 		startEvent = e;
 		GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
+		GEventStateMananger.getInstance().setMouseReleased(false);
+		GDrawingStateManager.getInstance().setMouseReleased(false);
 	}
 
 	@Override
@@ -28,7 +31,10 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 			List<MouseEvent> events = createMouseEvents(e);
 			GEventStateMananger.getInstance().setMouseEvents(events);
 			GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
+			GEventStateMananger.getInstance().setMouseReleased(true);
+			GDrawingStateManager.getInstance().setMouseReleased(true);
 			commandManager.executeAndStore(GMode.SHAPE);
+			startEvent = null;
 		}
 	}
 
@@ -38,6 +44,8 @@ public class GShapeDrawingHandler implements GMouseEventHandler {
 			List<MouseEvent> events = createMouseEvents(e);
 			GEventStateMananger.getInstance().setMouseEvents(events);
 			GEventStateMananger.getInstance().setCurrentPoint(e.getPoint());
+			GEventStateMananger.getInstance().setMouseReleased(false);
+			GDrawingStateManager.getInstance().setMouseReleased(false);
 			commandManager.execute(GMode.SHAPE);
 		}
 	}

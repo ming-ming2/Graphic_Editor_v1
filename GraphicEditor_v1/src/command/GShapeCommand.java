@@ -12,17 +12,18 @@ import type.GShapeType;
 
 public class GShapeCommand implements GCommand {
 	private GShape createdShape;
+	private GShape lastPreviewShape;
 
 	@Override
 	public void execute() {
 		GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
+		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 
 		if (createdShape != null) {
 			drawingManager.addShape(createdShape);
 			return;
 		}
 
-		GEventStateMananger eventManager = GEventStateMananger.getInstance();
 		List<MouseEvent> events = eventManager.getMouseEvents();
 		GShapeType shapeType = drawingManager.getCurrentShapeType();
 
@@ -35,12 +36,14 @@ public class GShapeCommand implements GCommand {
 
 		if (shape != null) {
 			MouseEvent lastEvent = events.get(events.size() - 1);
-			if (lastEvent.getID() == MouseEvent.MOUSE_RELEASED) {
+
+			if (lastEvent.getID() == MouseEvent.MOUSE_RELEASED || eventManager.isMouseReleased()) {
 				drawingManager.addShape(shape);
-				drawingManager.setPreviewShape(null);
+				lastPreviewShape = null;
 				this.createdShape = shape;
 			} else {
-				drawingManager.setPreviewShape(shape);
+				lastPreviewShape = shape;
+				drawingManager.notifyObservers();
 			}
 		}
 	}
@@ -51,5 +54,9 @@ public class GShapeCommand implements GCommand {
 			GDrawingStateManager drawingManager = GDrawingStateManager.getInstance();
 			drawingManager.removeShape(createdShape);
 		}
+	}
+
+	public GShape getLastPreviewShape() {
+		return lastPreviewShape;
 	}
 }
